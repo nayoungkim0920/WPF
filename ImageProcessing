@@ -1,0 +1,150 @@
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace WpfApp2
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            // 로딩 패널을 숨김
+            LoadingPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void OpenImage_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp",
+                Title = "이미지 파일 선택"
+            };
+
+            if(openFileDialog.ShowDialog() == true )
+            {
+                try
+                {
+                    var bitmap = new BitmapImage(new Uri(openFileDialog.FileName));
+                    bitmap.Freeze(); //스레드 안정성 보장
+                    ImageView.Source = bitmap;
+                    FilePathTextBlock.Text = openFileDialog.FileName;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"이미지를 로드하는 중 오류가 발생했습니다: {ex.Message}",
+                        "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private async void GrayScale_Click(object sender, RoutedEventArgs e)
+        {
+            if (ImageView.Source is BitmapImage bitmapImage)
+            {
+                try
+                {
+                    // 로딩 패널을 표시
+                    LoadingPanel.Visibility = Visibility.Visible;
+
+                    // 비동기적으로 그레이스케일 변환 작업을 수행
+                    var writeableBitmap = await Task.Run(() => ConvertToGrayScale(bitmapImage));
+
+                    // UI 스레드에서 이미지를 업데이트
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // 그레이스케일 변환이 완료된 후 이미지 업데이트
+                        ImageView.Source = writeableBitmap;
+
+                        // 로딩 패널을 숨김
+                        LoadingPanel.Visibility = Visibility.Collapsed;
+                    });
+                }
+                catch (Exception ex)
+                {
+                    // 로딩 패널을 숨김
+                    LoadingPanel.Visibility = Visibility.Collapsed;
+
+                    // 예외 처리
+                    MessageBox.Show($"이미지를 그레이스케일로 변환하는 중 오류가 발생했습니다: {ex.Message}",
+                        "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("이미지가 로드되지 않았습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private WriteableBitmap ConvertToGrayScale(BitmapImage bitmapImage)
+        {
+            // BitmapImage를 WriteableBitmap으로 변환
+            var writeableBitmap = new WriteableBitmap(bitmapImage);
+
+            // 이미지 크기 확인
+            int width = writeableBitmap.PixelWidth;
+            int height = writeableBitmap.PixelHeight;
+
+            // 크기가 0인 경우 예외 처리
+            if (width == 0 || height == 0)
+            {
+                throw new InvalidOperationException("이미지 크기가 유효하지 않습니다.");
+            }
+
+            Debug.WriteLine($"이미지 크기: Width={width}, Height={height}");
+
+            // WriteableBitmap의 픽셀 데이터 배열에 접근
+            var pixelData = new byte[width * height * 4]; // 4 bytes per pixel (ARGB)
+
+            // 픽셀 데이터 복사
+            writeableBitmap.CopyPixels(pixelData, width * 4, 0);
+
+            Debug.WriteLine("그레이스케일 변환 시작");
+
+            // 픽셀 데이터 변환
+            Parallel.For(0, height, y =>
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int pixelIndex = (y * width + x) * 4;
+                    byte a = pixelData[pixelIndex + 3]; // Alpha
+                    byte r = pixelData[pixelIndex + 2]; // Red
+                    byte g = pixelData[pixelIndex + 1]; // Green
+                    byte b = pixelData[pixelIndex];     // Blue
+
+                    // 그레이스케일 계산 (ITUR BT.601 기준)
+                    byte gray = (byte)(0.3 * r + 0.59 * g + 0.11 * b);
+
+                    // 그레이스케일 색상으로 픽셀 수정
+                    pixelData[pixelIndex + 3] = a;    // Alpha 값은 그대로 둡니다.
+                    pixelData[pixelIndex + 2] = gray; // Red
+                    pixelData[pixelIndex + 1] = gray; // Green
+                    pixelData[pixelIndex] = gray;     // Blue
+                }
+            });
+
+            Debug.WriteLine("그레이스케일 변환 완료");
+
+            // 변환된 픽셀 데이터를 WriteableBitmap에 다시 복사
+            writeableBitmap.Lock();
+            writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixelData, width * 4, 0);
+            writeableBitmap.Unlock();
+
+            return writeableBitmap;
+        }
+
+    }
+}
