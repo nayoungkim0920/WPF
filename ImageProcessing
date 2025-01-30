@@ -526,6 +526,53 @@ namespace WpfApp2
     }
 }
 
+cuda version
+c:\>nvidia-smi
+Thu Jan 30 20:05:58 2025
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 566.14                 Driver Version: 566.14         CUDA Version: 12.7     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 4060 ...  WDDM  |   00000000:01:00.0 Off |                  N/A |
+| N/A   45C    P8              2W /   85W |       1MiB /   8188MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+
+NVIDIA 드라이버 버전	566.14
+CUDA 버전	12.7
+GPU 모델	NVIDIA GeForce RTX 4060
+GPU 메모리	8GB (8188MiB)
+
+torch 버전
+c:\>python -c "import torch; print(torch.__version__)"
+2.6.0+cpu
+=> GPU 지원 버전의 PyTorch 설치
+c:\>pip uninstall torch
+c:\>pip install torch==2.6.0+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
+c:\>python -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.current_device()); print(torch.cuda.get_device_name(torch.cuda.current_device()))"
+2.6.0+cu118
+True
+0
+NVIDIA GeForce RTX 4060 Laptop GPU
+
+ultralytics 버전
+c:\>python -c "import ultralytics; print(ultralytics.__version__)"
+8.3.69
+
+c:\>python --version
+Python 3.13.0
+
 yolov5설치 및 업그레이드
 c:\>git clone https://github.com/ultralytics/yolov5.git
 c:\>cd yolov5
@@ -536,3 +583,63 @@ c:\yolov5>pip install --upgrade torch
 
 테스트
 C:\wpfProject\WpfApp2\WpfApp2\bin\Debug\net8.0-windows>python "C:\yolov5result\yolov5_inference.py" --source "C:\yolov5\yolov5_input_image.png" --output "C:\yolov5\yolov5_output_image.png"    
+
+오류
+C:\wpfProject\WpfApp2\WpfApp2\bin\Debug\net8.0-windows>python "C:\yolov5result\yolov5_inference.py" --source "C:\yolov5\yolov5_input_image.png" --output "C:\yolov5\yolov5_output_image.png"
+Traceback (most recent call last):
+  File "C:\yolov5result\yolov5_inference.py", line 24, in <module>
+    run_inference(args.source, args.output)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\yolov5result\yolov5_inference.py", line 10, in run_inference
+    results = model.predict(source)  # predict로 변경, verbose 인자 제거
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python313\Lib\site-packages\ultralytics\engine\model.py", line 551, in predict
+    self.predictor.setup_model(model=self.model, verbose=is_cli)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python313\Lib\site-packages\ultralytics\engine\predictor.py", line 310, in setup_model
+    self.model = AutoBackend(
+                 ~~~~~~~~~~~^
+        weights=model or self.args.model,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+        verbose=verbose,
+        ^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\utils\_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python313\Lib\site-packages\ultralytics\nn\autobackend.py", line 152, in __init__
+    model = model.fuse(verbose=verbose)
+TypeError: BaseModel.fuse() got an unexpected keyword argument 'verbose'
+
+=> PyTorch 및 ultralytics와 같은 딥러닝 관련 라이브러리들은 Python 3.8 또는 Python 3.9 python 3.9버전으로 설치하는 것이 안정적
+python 3.13.0 제어판 > 프로그림 및 기능 > 제거
+python 3.9 다운로드 후 설치(https://www.python.org/downloads/release/python-390/)
+Windows x86 executable installer	Windows     python-3.9.0.exe
+
+시스템 환경 변수 설정
+시스템환경변수편집 > 고급 > 환경변수 > 시스템 변수 > 
+PYTHONPATH : C:\Users\nayou\AppData\Local\Programs\Python\Python39-32;C:\Users\nayou\AppData\Local\Programs\Python\Python39-32\Scripts
+Path : %PYTHONPATH%;...
+
+파이썬 버전 확인
+c:\>python --version
+Python 3.9.0
+
+욜로설치
+c:\yolov5>pip install -r requrements.txt
+
+pip 최신 버전 설치
+c:\yolov5>c:\users\nayou\appdata\local\programs\python\python39-32\python.exe -m pip install --upgrade pip
+Collecting pip
+
+numpy 설치
+c:\>pip install numpy
+c:\>pip install numpy
+Requirement already satisfied: numpy in c:\users\nayou\appdata\local\programs\python\python39-32\lib\site-packages (2.0.2)
+
+scipy 설치
+c:\>pip install scipy
+
+SciPy 1.15.1 설치
+https://github.com/scipy/scipy/releases
+scipy-1.15.1.tar.gz   56.7 MB
