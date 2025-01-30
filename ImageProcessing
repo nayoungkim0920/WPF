@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -24,8 +25,13 @@ namespace WpfApp2
 
             // 로딩 패널을 숨김
             LoadingPanel.Visibility = Visibility.Collapsed;
+
             // 그레이스케일 버튼 비활성화
             GrayScaleButton.IsEnabled = false;
+            // 캐니엣지 버튼 비활성화
+            CannyEdgeButton.IsEnabled = false;
+            // 욜로v5 버튼 비활성화
+            YoloV5Button.IsEnabled = false;
         }
 
         private void OpenImage_Click(object sender, RoutedEventArgs e)
@@ -48,7 +54,7 @@ namespace WpfApp2
                     bitmapImage.Freeze(); // 스레드 안전성을 위해 고정
                     ImageView.Source = bitmapImage;
 
-                    //그레이스케일 버튼 활성화
+                    // 그레이스케일 버튼 활성화
                     GrayScaleButton.IsEnabled = true;
 
                     // 상태표시줄에 파일경로 출력
@@ -110,6 +116,8 @@ namespace WpfApp2
 
                     // 그레이스케일 버튼 비활성화
                     GrayScaleButton.IsEnabled = false;
+                    // 캐니엣지 버튼 활성화
+                    CannyEdgeButton.IsEnabled = true;
                 }
             }
             else
@@ -173,5 +181,358 @@ namespace WpfApp2
                 ProcessTimeTextBlock.Text = $"그레이스케일 처리 시간: {totalElapsedTime.TotalSeconds:F2}초";
             });            
         }
+
+        private async void CannyEdge_Click(object sender, RoutedEventArgs e)
+        {
+            if (ImageView.Source is WriteableBitmap writeableBitmap)
+            {
+                try
+                {
+                    // 처리중 보이기
+                    LoadingPanel.Visibility = Visibility.Visible;
+
+                    WriteableBitmap writeableBitmap1 = null;
+                    int width = 0, height = 0;
+
+                    // UI 스레드에서 WriteableBitmap 생성 및 크기 가져오기
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        writeableBitmap1= new WriteableBitmap(writeableBitmap);
+                        width = writeableBitmap.PixelWidth;
+                        height = writeableBitmap.PixelHeight;
+                    });
+
+
+                    if (writeableBitmap1 == null || width == 0 || height == 0)
+                        throw new InvalidOperationException("WriteableBitmap이 유효하지 않습니다.");
+
+                    // 시작 시간 기록
+                    var startTime = DateTime.Now;
+
+                    await Task.Run(() => ApplyCannyEdgeDetection(writeableBitmap1, width, height, startTime));
+
+                    // UI 스레드에서 WriteableBitmap 업데이트
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        writeableBitmap1.Freeze();
+                        ImageView.Source = writeableBitmap1;
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"캐니 엣지 검출 중 오류가 발생했습니다: {ex.Message}",
+                        "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    // 처리중 숨기기
+                    LoadingPanel.Visibility = Visibility.Collapsed;
+
+                    // 그레이스케일 버튼 비활성화
+                    GrayScaleButton.IsEnabled = false;
+                    // 캐니엣지 버튼 비활성화
+                    CannyEdgeButton.IsEnabled = false;
+                    // 욜로v5 버튼 활성화
+                    YoloV5Button.IsEnabled = true;
+                }
+            }
+            else
+            {
+                MessageBox.Show("그레이스케일 이미지가 필요합니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ApplyCannyEdgeDetection(WriteableBitmap writeableBitmap, int width, int height, DateTime startTime)
+        {
+            var pixelData = new byte[width * height * 4];
+
+            // UI 스레드에서 픽셀 데이터를 복사
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                writeableBitmap.CopyPixels(pixelData, width * 4, 0);
+            });
+
+            // 간단한 캐니 엣지 알고리즘 (Sobel Gradient + Thresholding)
+            var gradientData = new byte[width * height];
+
+            int[] gx = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
+            int[] gy = { -1, -2, -1, 0, 0, 0, 1, 2, 1 };
+
+            Parallel.For(1, height - 1, y =>
+            {
+                for (int x = 1; x < width - 1; x++)
+                {
+                    int pixelIndex = (y * width + x) * 4;
+                    double gradX = 0;
+                    double gradY = 0;
+
+                    for (int ky = -1; ky <= 1; ky++)
+                    {
+                        for (int kx = -1; kx <= 1; kx++)
+                        {
+                            int neighborIndex = ((y + ky) * width + (x + kx)) * 4;
+                            byte intensity = pixelData[neighborIndex];
+                            gradX += intensity * gx[(ky + 1) * 3 + (kx + 1)];
+                            gradY += intensity * gy[(ky + 1) * 3 + (kx + 1)];
+                        }
+                    }
+
+                    double gradientMagnitude = Math.Sqrt(gradX * gradX + gradY * gradY);
+                    gradientData[y * width + x] = (byte)(gradientMagnitude > 128 ? 255 : 0);
+                }
+            });
+
+
+            Parallel.For(0, height, y =>
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int pixelIndex = (y * width + x) * 4;
+                    byte edge = gradientData[y * width + x];
+                    pixelData[pixelIndex] = edge;
+                    pixelData[pixelIndex + 1] = edge;
+                    pixelData[pixelIndex + 2] = edge;
+                }
+            });
+
+            // 최종 처리 시간 계산
+            var totalElapsedTime = DateTime.Now - startTime;
+
+            // UI 스레드에서 픽셀 데이터를 다시 씀
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                writeableBitmap.Lock();
+                writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixelData, width * 4, 0);
+                writeableBitmap.Unlock();
+
+                ProcessTimeTextBlock.Text = $"캐니엣지 처리 시간: {totalElapsedTime.TotalSeconds:F2}초";
+            });
+        }
+
+        private async void YoloV5_Click(object sender, RoutedEventArgs e)
+        {
+            if (ImageView.Source is WriteableBitmap writeableBitmap)
+            {
+                try
+                {
+                    // 처리중 보이기
+                    LoadingPanel.Visibility = Visibility.Visible;
+
+                    WriteableBitmap writeableBitmap1 = null;
+                    int width = 0, height = 0;
+
+                    // UI 스레드에서 WriteableBitmap 생성 및 크기 가져오기
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        writeableBitmap1 = new WriteableBitmap(writeableBitmap);
+                        width = writeableBitmap.PixelWidth;
+                        height = writeableBitmap.PixelHeight;
+                    });
+
+
+                    if (writeableBitmap1 == null || width == 0 || height == 0)
+                        throw new InvalidOperationException("WriteableBitmap이 유효하지 않습니다.");
+
+                    // 시작 시간 기록
+                    var startTime = DateTime.Now;
+
+                    await Task.Run(() => ProcessYoloV5Async(writeableBitmap1, width, height, startTime));
+
+                    // UI 스레드에서 WriteableBitmap 업데이트
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        writeableBitmap1.Freeze();
+                        ImageView.Source = writeableBitmap1;
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"욜로v5검출 중 오류가 발생했습니다: {ex.Message}",
+                        "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    // 처리중 숨기기
+                    LoadingPanel.Visibility = Visibility.Collapsed;
+
+                    // 그레이스케일 버튼 비활성화
+                    GrayScaleButton.IsEnabled = false;
+                    // 캐니엣지 버튼 비활성화
+                    CannyEdgeButton.IsEnabled = false;
+                    // 욜로v5 버튼 활성화
+                    YoloV5Button.IsEnabled = false;
+                }
+            }
+            else
+            {
+                MessageBox.Show("그레이스케일 이미지가 필요합니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ProcessYoloV5Async(WriteableBitmap writeableBitmap, int width, int height, DateTime startTime)
+        {
+            var pythonScriptPath = @"C:\yolov5result\yolov5_inference.py";
+            var inputImagePath = "yolov5_input_image.png";
+            var outputImagePath = "yolov5_output_image.png";
+
+            var pixelData = new byte[width * height * 4];
+
+            // UI 스레드에서 픽셀 데이터를 복사
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                writeableBitmap.CopyPixels(pixelData, width * 4, 0);
+            });
+
+            // 픽셀데이터를 이미지로 저장
+            SaveBitmapToPng(writeableBitmap, inputImagePath);
+
+            // Yolov5 검출 로직
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = "python",
+                Arguments = $"\"{pythonScriptPath}\" \"{inputImagePath}\" \"{outputImagePath}\"",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+
+            using (var process = Process.Start(processStartInfo))
+            {
+                process.WaitForExit(); // Python 스크립트 실행이 완료될 때까지 대기
+            }
+
+            // 출력 이미지 픽셀 데이터로 변환
+            byte[] outputPixelData = LoadPngToPixels(outputImagePath, out width, out height);
+
+            // 최종 처리 시간 계산
+            var totalElapsedTime = DateTime.Now - startTime;
+
+            // UI 스레드에서 픽셀 데이터를 다시 씀
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                writeableBitmap.Lock();
+                writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), outputPixelData, width * 4, 0);
+                writeableBitmap.Unlock();
+
+                ProcessTimeTextBlock.Text = $"욜로v5객체감지 처리 시간: {totalElapsedTime.TotalSeconds:F2}초";
+            });
+        }
+
+        // 이미지 파일로 저장하는 함수
+        private void SaveBitmapToPng(WriteableBitmap writeableBitmap, string filePath)
+        {
+            if (writeableBitmap == null)
+                throw new ArgumentNullException(nameof(writeableBitmap), "WriteableBitmap이 null입니다.");
+
+            BitmapSource clonedBitmap = null;
+
+            // UI 스레드에서 Bitmap을 복사하고 Freeze() 호출
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var renderTarget = new RenderTargetBitmap(
+                    writeableBitmap.PixelWidth, writeableBitmap.PixelHeight,
+                    96, 96, PixelFormats.Pbgra32);
+
+                var visual = new DrawingVisual();
+                using (var context = visual.RenderOpen())
+                {
+                    context.DrawImage(writeableBitmap, new Rect(0, 0, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight));
+                }
+                renderTarget.Render(visual);
+
+                clonedBitmap = renderTarget;
+                clonedBitmap.Freeze(); // 반드시 UI 스레드에서 호출해야 오류 없음
+            });
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(clonedBitmap));
+                encoder.Save(stream);
+            }
+        }
+
+
+
+        // 이미지 파일을 로드하여 픽셀 데이터를 반환하는 함수
+        private byte[] LoadPngToPixels(string filePath, out int width, out int height)
+        {
+            try
+            {
+                if (!File.Exists(filePath))
+                {
+                    MessageBox.Show($"파일을 찾을 수 없습니다: {filePath}");
+                    width = height = 0;
+                    return null;
+                }
+
+                // PNG 파일이 완전히 저장될 때까지 대기
+                WaitForFile(filePath);
+
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.UriSource = new Uri(filePath, UriKind.Absolute);
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // 즉시 로드하여 파일 잠김 방지
+                bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreImageCache; // 이미지 캐시 무시
+                bitmapImage.EndInit();
+                bitmapImage.Freeze(); // 스레드 안전 처리
+
+                WriteableBitmap writeableBitmap = null;
+
+                // UI 스레드에서 WriteableBitmap 생성
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    writeableBitmap = new WriteableBitmap(bitmapImage);
+                });
+
+                width = writeableBitmap.PixelWidth;
+                height = writeableBitmap.PixelHeight;
+
+                var pixels = new byte[width * height * 4];
+
+                // 픽셀 데이터 추출
+                writeableBitmap.CopyPixels(pixels, width * 4, 0);
+
+                return pixels;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"PNG 로드 실패: {ex.Message}");
+                width = height = 0;
+                return null;
+            }
+        }
+
+        // 파일이 완전히 저장될 때까지 대기하는 함수
+        private void WaitForFile(string filePath)
+        {
+            int retryCount = 0;
+            while (retryCount < 5)
+            {
+                try
+                {
+                    using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
+                    {
+                        return; // 파일을 성공적으로 열면 종료
+                    }
+                }
+                catch (IOException)
+                {
+                    Thread.Sleep(200); // 200ms 대기 후 재시도
+                    retryCount++;
+                }
+            }
+        }
+
     }
 }
+
+yolov5설치 및 업그레이드
+c:\>git clone https://github.com/ultralytics/yolov5.git
+c:\>cd yolov5
+c:\yolov5>pip install -U -r requirements.txt
+c:\yolov5>python.exe -m pip install --upgrade pip
+c:\yolov5>pip install --upgrade ultralytics
+c:\yolov5>pip install --upgrade torch
+
+테스트
+C:\wpfProject\WpfApp2\WpfApp2\bin\Debug\net8.0-windows>python "C:\yolov5result\yolov5_inference.py" --source "C:\yolov5\yolov5_input_image.png" --output "C:\yolov5\yolov5_output_image.png"    
