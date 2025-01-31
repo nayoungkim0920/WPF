@@ -992,3 +992,109 @@ OpenCV는 Microsoft Visual C++ Redistributable에 의존
 https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
 설정 > 시스템 > 정보 > 64비트 운영 체제, x64 기반 프로세서
 X64	https://aka.ms/vs/17/release/vc_redist.x64.exe 다운로드 후 설치
+
+환경변수설정
+CV2 : C:\Users\nayou\AppData\Local\Programs\Python\Python39\Lib\site-packages\cv2
+Path : %CV2%;...
+
+cv2테스트
+nayou@nayoungkim MINGW64 ~
+$ python -c "import sys; print(sys.executable)"
+C:\msys64\mingw64\bin\python.exe
+
+nayou@nayoungkim MINGW64 ~
+$ python -c "import cv2; print(cv2.__version__)"
+ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
+
+nayou@nayoungkim MINGW64 ~
+$ /c/Users/nayou/AppData/Local/Programs/Python/Python39/python.exe -c "import cv2; print(cv2.__version__)"
+4.11.0
+
+nayou@nayoungkim MINGW64 ~
+$ which python
+/mingw64/bin/python
+
+~/.bashrc 환경변수 PATH 순서변경
+export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python39"  # Python 디렉토리 추가
+export PATH="$PATH:/c/Users/nayou/AppData/Local/Programs/Python/Python39/Scripts"  # Python 디렉토리 추가
+export PATH="$PATH:/mingw64/bin"
+
+nayou@nayoungkim MINGW64 ~
+$ which python
+/c/Users/nayou/AppData/Local/Programs/Python/Python39/python
+
+nayou@nayoungkim MINGW64 ~
+$  python -c "import cv2; print(cv2.__version__)"
+4.11.0
+
+C:\>python -c "import cv2; print(cv2.__version__)"
+4.11.0
+
+다시 ultralytics 버전 확인
+nayou@nayoungkim MINGW64 ~
+$ ultralytics --version
+ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
+
+ultralytics가 제대로 설치되었는지 확인
+nayou@nayoungkim MINGW64 ~
+$ pip list | grep ultralytics
+ultralytics             8.0.40
+ultralytics-thop        2.0.14
+
+nayou@nayoungkim MINGW64 ~
+$ which ultralytics
+/c/Users/nayou/AppData/Local/Programs/Python/Python39/Scripts/ultralytics
+
+nayou@nayoungkim MINGW64 ~
+$ pip show ultralytics
+Name: ultralytics
+Version: 8.3.70
+Summary: Ultralytics YOLO 🚀 for SOTA object detection, multi-object tracking, instance segmentation, pose estimation and image classification.
+Home-page: https://ultralytics.com
+Author:
+Author-email: Glenn Jocher <glenn.jocher@ultralytics.com>, Jing Qiu <jing.qiu@ultralytics.com>
+License: AGPL-3.0
+Location: c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages
+Requires: matplotlib, numpy, opencv-python, pandas, pillow, psutil, py-cpuinfo, pyyaml, requests, scipy, seaborn, torch, torchvision, tqdm, ultralytics-thop
+Required-by:
+
+nayou@nayoungkim MINGW64 ~
+$  python -c "import ultralytics; print(dir(ultralytics))"
+['ASSETS', 'FastSAM', 'NAS', 'RTDETR', 'SAM', 'SETTINGS', 'YOLO', 'YOLOWorld', '__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__', '__version__', 'cfg', 'checks', 'data', 'download', 'engine', 'hub', 'models', 'nn', 'os', 'settings', 'utils']
+
+nayou@nayoungkim MINGW64 ~
+$ python -m ultralytics.YOLO --version
+C:\Users\nayou\AppData\Local\Programs\Python\Python39\python.exe: No module named ultralytics.YOLO
+
+nayou@nayoungkim MINGW64 ~
+$  python -c "from ultralytics import YOLO; model=YOLO('yolov5n.pt'); print(model)"
+PRO TIP 💡 Replace 'model=yolov5n.pt' with new 'model=yolov5nu.pt'.
+YOLOv5 'u' models are trained with https://github.com/ultralytics/ultralytics and feature improved performance vs standard YOLOv5 models trained with https://github.com/ultralytics/yolov5.
+
+Downloading https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov5nu.pt to 'yolov5nu.pt'...
+100%|████████████████████████████████████████████████████████████████| 5.31M/5.31M [00:00<00:00, 10.5MB/s]
+YOLO(
+  (model): DetectionModel(
+    (model): Sequential(
+      (0): Conv(
+        (conv): Conv2d(3, 16, kernel_size=(6, 6), stride=(2, 2), padding=(2, 2), bias=False)
+        (bn): BatchNorm2d(16, eps=0.001, momentum=0.03, affine=True, track_running_stats=True)
+        (act): SiLU(inplace=True)
+      )
+      (1): Conv(
+        (conv): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn): BatchNorm2d(32, eps=0.001, momentum=0.03, affine=True, track_running_stats=True)
+        (act): SiLU(inplace=True)
+      )
+...
+=> YOLO 모델이 성공적으로 로드되었으며, 다운로드가 완료된 후 모델 구조 정보가 출력됨 
+
+c:\yolov5>git describe --tags
+v7.0-398-g5cdad892
+
+v7.0: YOLOv5의 버전이 v7.0
+398: v7.0 태그 이후에 398개의 커밋이 더 진행되었다
+g5cdad892: 마지막 커밋의 해시 값의 일부
+
+테스트
+python "C:\yolov5result\yolov5_inference.py" --source "yolov5_input_image.png" --output "yolov5_output_image.png"
