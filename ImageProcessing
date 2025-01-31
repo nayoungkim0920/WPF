@@ -640,6 +640,355 @@ Requirement already satisfied: numpy in c:\users\nayou\appdata\local\programs\py
 scipy 설치
 c:\>pip install scipy
 
-SciPy 1.15.1 설치
-https://github.com/scipy/scipy/releases
-scipy-1.15.1.tar.gz   56.7 MB
+c:\>where python
+c:\msys64\mingw64\bin\python.exe
+C:\Users\nayou\AppData\Local\Microsoft\WindowsApps\python.exe
+
+두 위치에 기존 python.exe를 제거하고
+C:\Users\nayou\AppData\Local\Programs\Python\Python39
+python.exe
+python39.dll
+을 복사해서 넣는다
+
+c:\>python --version
+Python 3.9.0
+
+c:\>py --version
+Python 3.9.0
+
+c:\>pip install scipy
+'pip'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
+배치 파일이 아닙니다.
+
+c:\>python -m pip --version
+pip 25.0 from C:\Users\nayou\AppData\Local\Programs\Python\Python39-32\lib\site-packages\pip (python 3.9)
+
+c:\>python -m pip install scipy
+오류류
+Collecting scipy
+  Using cached scipy-1.13.1.tar.gz (57.2 MB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... error
+  error: subprocess-exited-with-error
+
+  × Preparing metadata (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [31 lines of output]
+      + meson setup C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02 C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02\.mesonpy-38w5kk43 -Dbuildtype=release -Db_ndebug=if-release -Db_vscrt=md --native-file=C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02\.mesonpy-38w5kk43\meson-python-native-file.ini
+      The Meson build system
+      Version: 1.7.0
+      Source dir: C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02
+      Build dir: C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02\.mesonpy-38w5kk43
+      Build type: native build
+      Project name: scipy
+      Project version: 1.13.1
+      C compiler for the host machine: cl (msvc 19.29.30158 "x86용 Microsoft (R) C/C++ 최적화 컴파일러 버전 19.29.30158")
+      C linker for the host machine: link link 14.29.30158.0
+      C++ compiler for the host machine: cl (msvc 19.29.30158 "x86용 Microsoft (R) C/C++ 최적화 컴파일러 버전 19.29.30158")
+      C++ linker for the host machine: link link 14.29.30158.0
+      Cython compiler for the host machine: cython (cython 3.0.11)
+      Host machine cpu family: x86
+      Host machine cpu: x86
+      Program python found: YES (c:\msys64\mingw64\bin\python.exe)
+      Run-time dependency python found: YES 3.9
+      Program cython found: YES (C:\Users\nayou\AppData\Local\Temp\pip-build-env-7psmfzwm\overlay\Scripts\cython.EXE)
+      Compiler for C supports arguments -Wno-unused-but-set-variable: NO
+      Compiler for C supports arguments -Wno-unused-function: NO
+      Compiler for C supports arguments -Wno-conversion: NO
+      Compiler for C supports arguments -Wno-misleading-indentation: NO
+      Library m found: NO
+
+      ..\meson.build:78:0: ERROR: Unable to detect linker for compiler `gfortran -Wl,--version`
+      stdout:
+      stderr: gfortran: fatal error: '-fuse-linker-plugin', but liblto_plugin.dll not found
+      compilation terminated.
+
+
+      A full log can be found at C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02\.mesonpy-38w5kk43\meson-logs\meson-log.txt
+      [end of output]
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+
+× Encountered error while generating package metadata.
+╰─> See above for output.
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.
+
+수정
+gfortran 컴파일러와 관련된 liblto_plugin.dll 파일이 누락
+
+MSYS2에서 작업
+패키지 목록 최신으로 업데이트
+nayou@nayoungkim MINGW64 ~
+# pacman -Syu
+
+패키지 이름 확인
+nayou@nayoungkim MINGW64 ~
+# pacman -Ss gfortran
+mingw32/mingw-w64-i686-gcc-libgfortran 14.2.0-2
+    GNU Compiler Collection (libgfortran) for MinGW-w64
+mingw64/mingw-w64-x86_64-gcc-libgfortran 14.2.0-2
+    GNU Compiler Collection (libgfortran) for MinGW-w64
+ucrt64/mingw-w64-ucrt-x86_64-gcc-libgfortran 14.2.0-2
+    GNU Compiler Collection (libgfortran) for MinGW-w64
+
+Fortran 컴파일러 설치
+nayou@nayoungkim MINGW64 ~
+# pacman -S mingw-w64-x86_64-gcc-libgfortran
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (1) mingw-w64-x86_64-gcc-libgfortran-14.2.0-2
+
+총 다운로드 크기:  0.89 MiB
+총 설치 크기:      3.27 MiB
+
+:: 설치를 진행하시겠습니까? [Y/n] y
+:: 꾸러미 가져오는 중...
+ mingw-w64-x86_64-gcc-l...   910.3 KiB   193 KiB/s 00:05 [#############################] 100%
+(1/1) 키링의 키를 검사 중                                [#############################] 100%
+(1/1) 꾸러미 무결성 검사 중                              [#############################] 100%
+(1/1) 꾸러미 파일 불러오는 중                            [#############################] 100%
+(1/1) 파일 충돌 검사 중                                  [#############################] 100%
+오류: 커밋 트랜잭션에 실패했습니다(파일이 충돌합니다.)
+mingw-w64-x86_64-gcc-libgfortran: /mingw64/bin/libgfortran-5.dll가 파일 시스템에 있습니다
+오류가 발생하여 업그레이드한 꾸러미가 없습니다.
+nayou@nayoungkim MINGW64 ~
+# rm /mingw64/bin/libgfortran-5.dll
+pacman -S mingw-w64-x86_64-gcc-libgfortran
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (1) mingw-w64-x86_64-gcc-libgfortran-14.2.0-2
+
+총 설치 크기:  3.27 MiB
+
+:: 설치를 진행하시겠습니까? [Y/n] y
+(1/1) 키링의 키를 검사 중                                [#############################] 100%
+(1/1) 꾸러미 무결성 검사 중                              [#############################] 100%
+(1/1) 꾸러미 파일 불러오는 중                            [#############################] 100%
+(1/1) 파일 충돌 검사 중                                  [#############################] 100%
+(1/1) 사용 가능한 디스크 공간 검사 중                    [#############################] 100%
+:: 꾸러미 변경사항을 처리 중...
+(1/1) 설치 중 mingw-w64-x86_64-gcc-libgfortran           [#############################] 100%
+
+nayou@nayoungkim MINGW64 ~
+# gfortran --version
+GNU Fortran (x86_64-win32-seh-rev0, Built by MinGW-Builds project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+nayou@nayoungkim MINGW64 ~
+# pip install scipy
+오류
+Collecting scipy
+  Using cached scipy-1.13.1.tar.gz (57.2 MB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... error
+  error: subprocess-exited-with-error
+
+  × Preparing metadata (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [22 lines of output]
+      + meson setup C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01 C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01\.mesonpy-l43zklre -Dbuildtype=release -Db_ndebug=if-release -Db_vscrt=md --native-file=C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01\.mesonpy-l43zklre\meson-python-native-file.ini
+      The Meson build system
+      Version: 1.7.0
+      Source dir: C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01
+      Build dir: C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01\.mesonpy-l43zklre
+      Build type: native build
+      Project name: scipy
+      Project version: 1.13.1
+      C compiler for the host machine: x86_64-w64-mingw32-gcc (gcc 14.2.0 "x86_64-w64-mingw32-gcc (Rev2, Built by MSYS2 project) 14.2.0")
+      C linker for the host machine: x86_64-w64-mingw32-gcc ld.bfd 2.43.1
+      C++ compiler for the host machine: x86_64-w64-mingw32-g++ (gcc 14.2.0 "x86_64-w64-mingw32-g++ (Rev2, Built by MSYS2 project) 14.2.0")
+      C++ linker for the host machine: x86_64-w64-mingw32-g++ ld.bfd 2.43.1
+      Cython compiler for the host machine: cython (cython 3.0.11)
+      Host machine cpu family: x86_64
+      Host machine cpu: x86_64
+      Program python found: YES (c:\users\nayou\appdata\local\programs\python\python39-32\python.exe)
+      Need python for x86_64, but found x86
+      Run-time dependency python found: NO (tried sysconfig)
+
+      ..\meson.build:22:14: ERROR: Python dependency not found
+
+      A full log can be found at C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01\.mesonpy-l43zklre\meson-logs\meson-log.txt
+      [end of output]
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+
+× Encountered error while generating package metadata.
+╰─> See above for output.
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.
+수정
+
+Python 3.9 32bit -> 64bit로 재설치
+Python 3.9.5 Windows Installer 64bit 설치
+https://www.python.org/downloads/release/python-395/
+Windows installer (64-bit)	Windows	Recommended	53a354a15baed952ea9519a7f4d87c3f	27.1 MB	SIG
+환경변수, where 경로등을 변경하여 준다
+
+nayou@nayoungkim MINGW64 ~
+# pip install scipy
+Collecting scipy
+  Downloading scipy-1.13.1-cp39-cp39-win_amd64.whl (46.2 MB)
+     |████████████████████████████████| 46.2 MB 6.4 MB/s
+Collecting numpy<2.3,>=1.22.4
+  Downloading numpy-2.0.2-cp39-cp39-win_amd64.whl (15.9 MB)
+     |████████████████████████████████| 15.9 MB 6.8 MB/s
+Installing collected packages: numpy, scipy
+Successfully installed numpy-2.0.2 scipy-1.13.1
+WARNING: You are using pip version 21.1.1; however, version 25.0 is available.
+You should consider upgrading via the 'c:\users\nayou\appdata\local\programs\python\python39\python.exe -m pip install --upgrade pip' command.
+
+nayou@nayoungkim MINGW64 ~
+# python  -m pip install --upgrade pip
+Requirement already satisfied: pip in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (21.1.1)
+Collecting pip
+  Using cached pip-25.0-py3-none-any.whl (1.8 MB)
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 21.1.1
+    Uninstalling pip-21.1.1:
+      Successfully uninstalled pip-21.1.1
+Successfully installed pip-25.0
+
+nayou@nayoungkim MINGW64 ~
+# pip install scipy
+Requirement already satisfied: scipy in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (1.13.1)
+Requirement already satisfied: numpy<2.3,>=1.22.4 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from scipy) (2.0.2)
+
+nayou@nayoungkim MINGW64 ~
+# pip uninstall scipy
+Found existing installation: scipy 1.13.1
+Uninstalling scipy-1.13.1:
+  Would remove:
+    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy-1.13.1-cp39-cp39-win_amd64.whl
+    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy-1.13.1.dist-info\*
+    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy.libs\.load-order-scipy-1.13.1
+    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy.libs\libopenblas_v0.3.27--3aa239bc726cfb0bd8e5330d8d4c15c6.dll
+    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy\*
+Proceed (Y/n)? y
+  Successfully uninstalled scipy-1.13.1
+
+nayou@nayoungkim MINGW64 ~
+# pip install scipy
+Collecting scipy
+  Downloading scipy-1.13.1-cp39-cp39-win_amd64.whl.metadata (60 kB)
+Requirement already satisfied: numpy<2.3,>=1.22.4 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from scipy) (2.0.2)
+Downloading scipy-1.13.1-cp39-cp39-win_amd64.whl (46.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 46.2/46.2 MB 9.9 MB/s eta 0:00:00
+Installing collected packages: scipy
+Successfully installed scipy-1.13.1
+
+다시 yolov5 설정
+c:\>cd yolov5
+c:\yolov5>pip install -U -r requirements.txt
+c:\yolov5>python.exe -m pip install --upgrade pip
+c:\yolov5>pip install --upgrade ultralytics
+c:\yolov5>pip install --upgrade torch
+
+테스트
+C:\wpfProject\WpfApp2\WpfApp2\bin\Debug\net8.0-windows>python "C:\yolov5result\yolov5_inference.py" --source "C:\yolov5\yolov5_input_image.png" --output "C:\yolov5\yolov5_output_image.png" 
+
+C:\wpfProject\WpfApp2\WpfApp2\bin\Debug\net8.0-windows>python "C:\yolov5result\yolov5_inference.py" --source "C:\yolov5\yolov5_input_image.png" --output "C:\yolov5\yolov5_output_image.png"
+WARNING ⚠️ C:\yolov5result\exp23\weights\best.pt appears to require 'dill', which is not in Ultralytics requirements.
+AutoInstall will run now for 'dill' but this feature will be removed in the future.
+Recommend fixes are to train a new model using the latest 'ultralytics' package or to run a command with an official Ultralytics model, i.e. 'yolo predict model=yolo11n.pt'
+requirements: Ultralytics requirement ['dill'] not found, attempting AutoUpdate...
+Collecting dill
+  Downloading dill-0.3.9-py3-none-any.whl.metadata (10 kB)
+Downloading dill-0.3.9-py3-none-any.whl (119 kB)
+Installing collected packages: dill
+Successfully installed dill-0.3.9
+
+requirements: AutoUpdate success ✅ 0.8s, installed 1 package: ['dill']
+requirements: ⚠️ Restart runtime or rerun command for updates to take effect
+
+Traceback (most recent call last):
+  File "C:\yolov5result\yolov5_inference.py", line 24, in <module>
+    run_inference(args.source, args.output)
+  File "C:\yolov5result\yolov5_inference.py", line 10, in run_inference
+    results = model.predict(source)  # predict로 변경, verbose 인자 제거
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\ultralytics\engine\model.py", line 551, in predict
+    self.predictor.setup_model(model=self.model, verbose=is_cli)
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\ultralytics\engine\predictor.py", line 310, in setup_model
+    self.model = AutoBackend(
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\utils\_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\ultralytics\nn\autobackend.py", line 152, in __init__
+    model = model.fuse(verbose=verbose)
+TypeError: fuse() got an unexpected keyword argument 'verbose'
+
+MSYS2
+pip uninstall ultralytics
+pip uninstall torch
+pip install ultralytics==8.0.40  # ultralytics의 특정 버전으로 설치 
+pip install torch==1.13.1  # 호환되는 torch 버전으로 설치
+
+ultralytics --version 
+ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
+
+nayou@nayoungkim MINGW64 ~
+# pip uninstall opencv-python
+pip install opencv-python
+Found existing installation: opencv-python 4.11.0.86
+Uninstalling opencv-python-4.11.0.86:
+  Would remove:
+    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\cv2\*
+    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\opencv_python-4.11.0.86.dist-info\*
+Proceed (Y/n)? y
+  Successfully uninstalled opencv-python-4.11.0.86
+Collecting opencv-python
+  Using cached opencv_python-4.11.0.86-cp37-abi3-win_amd64.whl.metadata (20 kB)
+Requirement already satisfied: numpy>=1.17.0 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from opencv-python) (2.0.2)
+Using cached opencv_python-4.11.0.86-cp37-abi3-win_amd64.whl (39.5 MB)
+Installing collected packages: opencv-python
+Successfully installed opencv-python-4.11.0.86
+
+nayou@nayoungkim MINGW64 ~
+# ultralytics --version
+ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
+
+nayou@nayoungkim MINGW64 ~
+# pip install opencv-python
+Collecting opencv-python
+  Using cached opencv_python-4.11.0.86-cp37-abi3-win_amd64.whl.metadata (20 kB)
+Requirement already satisfied: numpy>=1.17.0 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from opencv-python) (2.0.2)
+Using cached opencv_python-4.11.0.86-cp37-abi3-win_amd64.whl (39.5 MB)
+Installing collected packages: opencv-python
+Successfully installed opencv-python-4.11.0.86
+
+nayou@nayoungkim MINGW64 ~
+# pip install opencv-contrib-python
+Collecting opencv-contrib-python
+  Downloading opencv_contrib_python-4.11.0.86-cp37-abi3-win_amd64.whl.metadata (20 kB)
+Requirement already satisfied: numpy>=1.17.0 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from opencv-contrib-python) (2.0.2)
+Downloading opencv_contrib_python-4.11.0.86-cp37-abi3-win_amd64.whl (46.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 46.2/46.2 MB 9.5 MB/s eta 0:00:00
+Installing collected packages: opencv-contrib-python
+Successfully installed opencv-contrib-python-4.11.0.86
+
+nayou@nayoungkim MINGW64 ~
+# python -c "import cv2; print(cv2.__version__)"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\cv2\__init__.py", line 181, in <module>
+    bootstrap()
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\cv2\__init__.py", line 153, in bootstrap
+    native_module = importlib.import_module("cv2")
+  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\Lib\importlib\__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
+
+OpenCV는 Microsoft Visual C++ Redistributable에 의존
+https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
+설정 > 시스템 > 정보 > 64비트 운영 체제, x64 기반 프로세서
+X64	https://aka.ms/vs/17/release/vc_redist.x64.exe 다운로드 후 설치
