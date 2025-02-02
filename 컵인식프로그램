@@ -20,7 +20,14 @@ Windows 11 Pro
 Intel(R) UHD Graphics
 NVIDIA GeForce RTX 4060 Laptop GPU
 
-3. 프로그램
+3. 기능
+열기 : 이미지불러오기
+그레이스케일 : 그레이스케일
+캐니엣지 : 케니엣지
+욜로v5 : YOLOv5로 학습한 best.pt로 컵이미지 detection
+욜로검출결과삭제 : 검출결과 폴더 및 파일 삭제
+
+4. 프로그램
 1) WPF
 - MainWindow.xaml
 <Window x:Class="WpfApp2.MainWindow"
