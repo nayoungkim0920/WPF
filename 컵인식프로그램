@@ -1,3 +1,26 @@
+프로그램명 : 간단한 이미지 프로세싱 및 컵인식 프로그램
+1.개발도구 : 
+1) WPF
+Microsoft Visual Studio Enterprise 2022 (64-bit) - Current
+버전 17.12.4
+Microsoft .NET Framework 버전 4.8.09032
+C# 도구   4.12.0-3.24631.1+da7c6c4257b2f661024b9a506773372a09023eee
+
+2) Python 3.9.5
+
+3) YOLOv5
+
+2. 개발환경 : 
+64비트 운영 체제 
+x64 기반 프로세서
+Windows 11 Pro
+13th Gen Intel(R) Core(TM) i7-13620H   2.40 GHz
+Intel(R) UHD Graphics
+NVIDIA GeForce RTX 4060 Laptop GPU
+
+3. 프로그램
+1) WPF
+- MainWindow.xaml
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
