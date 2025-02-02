@@ -9,6 +9,8 @@ C# 도구   4.12.0-3.24631.1+da7c6c4257b2f661024b9a506773372a09023eee
 2) Python 3.9.5
 
 3) YOLOv5
+ultralytics             8.3.70
+ultralytics-thop        2.0.14
 
 2. 개발환경 : 
 64비트 운영 체제 
@@ -21,6 +23,128 @@ NVIDIA GeForce RTX 4060 Laptop GPU
 3. 프로그램
 1) WPF
 - MainWindow.xaml
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp2.ViewModels"
+        xmlns:conv="clr-namespace:WpfApp2.Converters"
+        mc:Ignorable="d"
+        Title="이미지 편집기" Height="600" Width="800">
+    
+    <!-- 리소스 등록 (BoolToVisibilityConverter) -->
+    <Window.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+
+        <!-- 버튼 스타일 정의 -->
+        <Style x:Key="ToolbarButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Background" Value="LightSteelBlue"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderBrush" Value="DarkSlateGray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Gray" Direction="315" ShadowDepth="2" BlurRadius="4"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 무지개색 애니메이션 (더 빠르게 여러 색상으로 변하게) -->
+        <Storyboard x:Key="RainbowAnimation" RepeatBehavior="Forever">
+            <ColorAnimation
+                Storyboard.TargetName="SpinnerStrokeBrush"
+                Storyboard.TargetProperty="Color"
+                From="Red"
+                To="Blue"
+                Duration="0:0:0.5"   
+                AutoReverse="True"
+                RepeatBehavior="Forever"/>
+        </Storyboard>
+
+        <!-- 공이 위아래로 더 빠르고 더 높게 튕기는 애니메이션 -->
+        <Storyboard x:Key="BounceAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation
+                Storyboard.TargetName="SpinnerTranslateTransform"
+                Storyboard.TargetProperty="Y"
+                From="0" To="-150"    
+                Duration="0:0:0.10"                
+                AutoReverse="True"/>
+        </Storyboard>
+
+    </Window.Resources>
+    
+    <Window.DataContext>
+        <local:MainViewModel/>
+    </Window.DataContext>
+    
+    <Grid>
+        
+        <!-- 행 정의 -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- 툴바 -->
+        <ToolBar Grid.Row="0" VerticalAlignment="Top" Height="26.96">
+            <Button Content="열기" HorizontalAlignment="Left" VerticalAlignment="Top" Click="OpenImage_Click"/>
+            <Button x:Name="GrayScaleButton" Content="그레이스케일" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GrayScale_Click"/>
+            <Button x:Name="CannyEdgeButton" Content="캐니엣지" HorizontalAlignment="Left" VerticalAlignment="Top" Click="CannyEdge_Click"/>
+            <Button x:Name="YoloV5Button" Content="욜로v5" HorizontalAlignment="Left" VerticalAlignment="Top" Click="YoloV5_Click"/>
+            <Button x:Name="ClearButton" Content="욜로검출결과삭제" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Clear_Click"/>
+        </ToolBar>
+        
+        <!-- 콘텐츠 영역 -->
+        <Grid Grid.Row="1" Background="LightGray">
+
+            <!-- 이미지 영역 -->
+            <Image x:Name="ImageView" VerticalAlignment="Top"/>
+
+            <!-- 처리중 표시 -->
+            <Grid x:Name="LoadingPanel" HorizontalAlignment="Center" VerticalAlignment="Center" Background="LightGray" Opacity="0.8"
+                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" Width="200" Height="200">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                    <!-- 회전하는 원 -->
+                    <Ellipse x:Name="Spinner" Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform x:Name="SpinnerRotation" CenterX="0.5" CenterY="0.5"/>
+                        </Ellipse.RenderTransform>
+                        <Ellipse.Stroke>
+                            <SolidColorBrush x:Name="SpinnerStrokeBrush" Color="Red"/>
+                        </Ellipse.Stroke>
+                        <Ellipse.StrokeThickness>10</Ellipse.StrokeThickness>
+                    </Ellipse>
+                    <!-- 처리중 텍스트 -->
+                    <TextBlock Text="처리 중..." HorizontalAlignment="Center" Margin="10,10,10,0" FontSize="14" FontWeight="Bold"/>
+                </StackPanel>
+            </Grid>
+
+
+        </Grid>
+        
+        <!-- 상태표시줄 -->
+        <StatusBar x:Name="StatusDisplay" Grid.Row="2" Height="26.96">
+            <TextBlock x:Name="FilePathTextBlock" TextWrapping="Wrap" Text="파일경로." HorizontalAlignment="Center"/>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock x:Name="ProcessTimeTextBlock" TextWrapping="Wrap" Text="처리속도" HorizontalAlignment="Right"/>
+            </StatusBarItem>            
+        </StatusBar>
+        
+    </Grid>    
+    
+</Window>
+
+- MainWindow.xaml.cs
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -35,6 +159,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using WpfApp2.ViewModels; // ViewModel 네임스페이스 추가
+using WpfApp2.Converters;
+using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader; // Converter 네임스페이스 추가
+using System.Windows.Media.Animation;
+using System;
+
+using WpfApp2.ImageProcessing;
+using WpfApp2.Util;
+
 namespace WpfApp2
 {
     /// <summary>
@@ -42,19 +176,56 @@ namespace WpfApp2
     /// </summary>
     public partial class MainWindow : Window
     {
+        public MainViewModel ViewModel { get; set; }
+
+        private GrayscaleProcessor grayscaleProcessor;
+        private CannyEdgeProcessor cannyEdgeProcessor;
+
         public MainWindow()
         {
             InitializeComponent();
 
+            grayscaleProcessor = new GrayscaleProcessor();
+            cannyEdgeProcessor = new CannyEdgeProcessor();
+
+            // ViewModel
+            ViewModel = new MainViewModel();
+            DataContext = ViewModel; // ViewModel을 DataContext에 연결
+
+            // 로딩 패널 애니메이션 설정
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+
             // 로딩 패널을 숨김
-            LoadingPanel.Visibility = Visibility.Collapsed;
+            ViewModel.IsLoading = false;
+
 
             // 그레이스케일 버튼 비활성화
-            GrayScaleButton.IsEnabled = false;
+            //GrayScaleButton.IsEnabled = false;
             // 캐니엣지 버튼 비활성화
-            CannyEdgeButton.IsEnabled = false;
+            //CannyEdgeButton.IsEnabled = false;
             // 욜로v5 버튼 비활성화
-            YoloV5Button.IsEnabled = false;
+            //YoloV5Button.IsEnabled = false;
+        }
+
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // IsLoading 속성이 변경되면 애니메이션 제어
+            var viewModel = (MainViewModel)sender;
+            var RainbowAnimation = (Storyboard)this.Resources["RainbowAnimation"];
+
+            if(e.PropertyName == nameof(MainViewModel.IsLoading))
+            {
+                if (viewModel.IsLoading)
+                {
+                    //MessageBox.Show("IsLoading이 true로 변경되었습니다.");
+                    RainbowAnimation.Begin();
+                }
+                else
+                {
+                    //MessageBox.Show("IsLoading이 false로 변경되었습니다.");
+                    RainbowAnimation.Stop();
+                }
+            }
         }
 
         private void OpenImage_Click(object sender, RoutedEventArgs e)
@@ -78,7 +249,7 @@ namespace WpfApp2
                     ImageView.Source = bitmapImage;
 
                     // 그레이스케일 버튼 활성화
-                    GrayScaleButton.IsEnabled = true;
+                    //GrayScaleButton.IsEnabled = true;
 
                     // 상태표시줄에 파일경로 출력
                     FilePathTextBlock.Text = openFileDialog.FileName;
@@ -98,7 +269,120 @@ namespace WpfApp2
                 try
                 {
                     // 처리중 보이기
-                    LoadingPanel.Visibility = Visibility.Visible;
+                    ViewModel.IsLoading = true;
+
+                    WriteableBitmap writeableBitmap = null;
+                    int width = 0, height = 0;
+
+                    // UI 스레드에서 WriteableBitmap 생성 및 크기 가져오기
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        writeableBitmap = new WriteableBitmap(bitmapImage);
+                        width = writeableBitmap.PixelWidth;
+                        height = writeableBitmap.PixelHeight;
+                    });
+
+                    if (writeableBitmap == null || width == 0 || height == 0)
+                        throw new InvalidOperationException("WriteableBitmap이 유효하지 않습니다.");
+
+                    // 비동기적으로 그레이스케일 변환
+                    WriteableBitmap processBitmap = await grayscaleProcessor.ConvertToGrayScaleAsync(bitmapImage, ProcessTimeTextBlock);
+
+                    // UI 스레드에서 WriteableBitmap 업데이트
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        processBitmap.Freeze();
+                        ImageView.Source = processBitmap;
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"이미지를 그레이스케일로 변환하는 중 오류가 발생했습니다: {ex.Message}",
+                        "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    // 처리중 숨기기
+                    ViewModel.IsLoading = false;
+
+                    // 그레이스케일 버튼 비활성화
+                    //GrayScaleButton.IsEnabled = false;
+                    // 캐니엣지 버튼 활성화
+                    //CannyEdgeButton.IsEnabled = true;
+                }
+            }
+            else
+            {
+                MessageBox.Show("이미지가 로드되지 않았습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void CannyEdge_Click(object sender, RoutedEventArgs e)
+        {
+            if (ImageView.Source is WriteableBitmap writeableBitmap)
+            {
+                try
+                {
+                    // 처리중 보이기
+                    ViewModel.IsLoading = true;
+
+                    WriteableBitmap writeableBitmap1 = null;
+                    int width = 0, height = 0;
+
+                    // UI 스레드에서 WriteableBitmap 생성 및 크기 가져오기
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        writeableBitmap1= new WriteableBitmap(writeableBitmap);
+                        width = writeableBitmap.PixelWidth;
+                        height = writeableBitmap.PixelHeight;
+                    });
+
+
+                    if (writeableBitmap1 == null || width == 0 || height == 0)
+                        throw new InvalidOperationException("WriteableBitmap이 유효하지 않습니다.");
+
+                    // 비동기적으로 캐이엣지 적용
+                    WriteableBitmap resultBitmap = await cannyEdgeProcessor.ApplyCannyEdgeDetectionAsync(writeableBitmap1, ProcessTimeTextBlock);
+
+                    // UI 스레드에서 WriteableBitmap 업데이트
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        resultBitmap.Freeze();
+                        ImageView.Source = resultBitmap;
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"캐니 엣지 검출 중 오류가 발생했습니다: {ex.Message}",
+                        "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    // 처리중 숨기기
+                    ViewModel.IsLoading = false;
+
+                    // 그레이스케일 버튼 비활성화
+                    //GrayScaleButton.IsEnabled = false;
+                    // 캐니엣지 버튼 비활성화
+                    //CannyEdgeButton.IsEnabled = false;
+                    // 욜로v5 버튼 활성화
+                    //YoloV5Button.IsEnabled = true;
+                }
+            }
+            else
+            {
+                MessageBox.Show("그레이스케일 이미지가 필요합니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void YoloV5_Click(object sender, RoutedEventArgs e)
+        {
+            if (ImageView.Source is BitmapImage bitmapImage)
+            {
+                try
+                {
+                    // 처리중 보이기
+                    ViewModel.IsLoading = true;
 
                     WriteableBitmap writeableBitmap = null;
                     int width = 0, height = 0;
@@ -117,255 +401,13 @@ namespace WpfApp2
                     // 시작 시간 기록
                     var startTime = DateTime.Now;
 
-                    // 비동기적으로 그레이스케일 변환
-                    await Task.Run(() => ConvertToGrayScale(writeableBitmap, width, height, startTime));
-
+                    await Task.Run(() => ProcessYoloV5Async(writeableBitmap, width, height, startTime));
+                    
                     // UI 스레드에서 WriteableBitmap 업데이트
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         writeableBitmap.Freeze();
                         ImageView.Source = writeableBitmap;
-                    });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"이미지를 그레이스케일로 변환하는 중 오류가 발생했습니다: {ex.Message}",
-                        "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                finally
-                {
-                    // 처리중 숨기기
-                    LoadingPanel.Visibility = Visibility.Collapsed;
-
-                    // 그레이스케일 버튼 비활성화
-                    GrayScaleButton.IsEnabled = false;
-                    // 캐니엣지 버튼 활성화
-                    CannyEdgeButton.IsEnabled = true;
-                }
-            }
-            else
-            {
-                MessageBox.Show("이미지가 로드되지 않았습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void ConvertToGrayScale(WriteableBitmap writeableBitmap, int width, int height, DateTime startTime)
-        {
-            var pixelData = new byte[width * height * 4];
-
-            // UI 스레드에서 픽셀 데이터를 복사
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                writeableBitmap.CopyPixels(pixelData, width * 4, 0);
-            });            
-
-            Parallel.For(0, height, y =>
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    int pixelIndex = (y * width + x) * 4;
-                    byte a = pixelData[pixelIndex + 3];
-                    byte r = pixelData[pixelIndex + 2];
-                    byte g = pixelData[pixelIndex + 1];
-                    byte b = pixelData[pixelIndex];
-
-                    byte gray = (byte)(0.3 * r + 0.59 * g + 0.11 * b);
-
-                    pixelData[pixelIndex + 3] = a;    // Alpha
-                    pixelData[pixelIndex + 2] = gray; // Red
-                    pixelData[pixelIndex + 1] = gray; // Green
-                    pixelData[pixelIndex] = gray;     // Blue
-                }
-
-                // 처리된 시간 계산
-                //var elapsedTime = DateTime.Now - startTime;
-                //var processedRows = y + 1; // 현재 처리된 줄
-                //var totalRows = height;
-                //var processingSpeed = (processedRows / elapsedTime.TotalSeconds).ToString("F2"); // 초당 처리된 줄 수
-
-                // UI 스레드에서 상태 표시줄에 처리 속도 업데이트
-                //Application.Current.Dispatcher.Invoke(() =>
-                //{
-                //    ProcessTimeTextBlock.Text = $"처리 중: {processedRows}/{totalRows} 줄, 속도: {processingSpeed} 줄/초";
-                //});
-            });
-
-            // 최종 처리 시간 계산
-            var totalElapsedTime = DateTime.Now - startTime;
-
-
-            // UI 스레드에서 픽셀 데이터를 다시 씀
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                writeableBitmap.Lock();
-                writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixelData, width * 4, 0);
-                writeableBitmap.Unlock();
-
-                ProcessTimeTextBlock.Text = $"그레이스케일 처리 시간: {totalElapsedTime.TotalSeconds:F2}초";
-            });            
-        }
-
-        private async void CannyEdge_Click(object sender, RoutedEventArgs e)
-        {
-            if (ImageView.Source is WriteableBitmap writeableBitmap)
-            {
-                try
-                {
-                    // 처리중 보이기
-                    LoadingPanel.Visibility = Visibility.Visible;
-
-                    WriteableBitmap writeableBitmap1 = null;
-                    int width = 0, height = 0;
-
-                    // UI 스레드에서 WriteableBitmap 생성 및 크기 가져오기
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        writeableBitmap1= new WriteableBitmap(writeableBitmap);
-                        width = writeableBitmap.PixelWidth;
-                        height = writeableBitmap.PixelHeight;
-                    });
-
-
-                    if (writeableBitmap1 == null || width == 0 || height == 0)
-                        throw new InvalidOperationException("WriteableBitmap이 유효하지 않습니다.");
-
-                    // 시작 시간 기록
-                    var startTime = DateTime.Now;
-
-                    await Task.Run(() => ApplyCannyEdgeDetection(writeableBitmap1, width, height, startTime));
-
-                    // UI 스레드에서 WriteableBitmap 업데이트
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        writeableBitmap1.Freeze();
-                        ImageView.Source = writeableBitmap1;
-                    });
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"캐니 엣지 검출 중 오류가 발생했습니다: {ex.Message}",
-                        "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                finally
-                {
-                    // 처리중 숨기기
-                    LoadingPanel.Visibility = Visibility.Collapsed;
-
-                    // 그레이스케일 버튼 비활성화
-                    GrayScaleButton.IsEnabled = false;
-                    // 캐니엣지 버튼 비활성화
-                    CannyEdgeButton.IsEnabled = false;
-                    // 욜로v5 버튼 활성화
-                    YoloV5Button.IsEnabled = true;
-                }
-            }
-            else
-            {
-                MessageBox.Show("그레이스케일 이미지가 필요합니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void ApplyCannyEdgeDetection(WriteableBitmap writeableBitmap, int width, int height, DateTime startTime)
-        {
-            var pixelData = new byte[width * height * 4];
-
-            // UI 스레드에서 픽셀 데이터를 복사
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                writeableBitmap.CopyPixels(pixelData, width * 4, 0);
-            });
-
-            // 간단한 캐니 엣지 알고리즘 (Sobel Gradient + Thresholding)
-            var gradientData = new byte[width * height];
-
-            int[] gx = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
-            int[] gy = { -1, -2, -1, 0, 0, 0, 1, 2, 1 };
-
-            Parallel.For(1, height - 1, y =>
-            {
-                for (int x = 1; x < width - 1; x++)
-                {
-                    int pixelIndex = (y * width + x) * 4;
-                    double gradX = 0;
-                    double gradY = 0;
-
-                    for (int ky = -1; ky <= 1; ky++)
-                    {
-                        for (int kx = -1; kx <= 1; kx++)
-                        {
-                            int neighborIndex = ((y + ky) * width + (x + kx)) * 4;
-                            byte intensity = pixelData[neighborIndex];
-                            gradX += intensity * gx[(ky + 1) * 3 + (kx + 1)];
-                            gradY += intensity * gy[(ky + 1) * 3 + (kx + 1)];
-                        }
-                    }
-
-                    double gradientMagnitude = Math.Sqrt(gradX * gradX + gradY * gradY);
-                    gradientData[y * width + x] = (byte)(gradientMagnitude > 128 ? 255 : 0);
-                }
-            });
-
-
-            Parallel.For(0, height, y =>
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    int pixelIndex = (y * width + x) * 4;
-                    byte edge = gradientData[y * width + x];
-                    pixelData[pixelIndex] = edge;
-                    pixelData[pixelIndex + 1] = edge;
-                    pixelData[pixelIndex + 2] = edge;
-                }
-            });
-
-            // 최종 처리 시간 계산
-            var totalElapsedTime = DateTime.Now - startTime;
-
-            // UI 스레드에서 픽셀 데이터를 다시 씀
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                writeableBitmap.Lock();
-                writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixelData, width * 4, 0);
-                writeableBitmap.Unlock();
-
-                ProcessTimeTextBlock.Text = $"캐니엣지 처리 시간: {totalElapsedTime.TotalSeconds:F2}초";
-            });
-        }
-
-        private async void YoloV5_Click(object sender, RoutedEventArgs e)
-        {
-            if (ImageView.Source is WriteableBitmap writeableBitmap)
-            {
-                try
-                {
-                    // 처리중 보이기
-                    LoadingPanel.Visibility = Visibility.Visible;
-
-                    WriteableBitmap writeableBitmap1 = null;
-                    int width = 0, height = 0;
-
-                    // UI 스레드에서 WriteableBitmap 생성 및 크기 가져오기
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        writeableBitmap1 = new WriteableBitmap(writeableBitmap);
-                        width = writeableBitmap.PixelWidth;
-                        height = writeableBitmap.PixelHeight;
-                    });
-
-
-                    if (writeableBitmap1 == null || width == 0 || height == 0)
-                        throw new InvalidOperationException("WriteableBitmap이 유효하지 않습니다.");
-
-                    // 시작 시간 기록
-                    var startTime = DateTime.Now;
-
-                    await Task.Run(() => ProcessYoloV5Async(writeableBitmap1, width, height, startTime));
-
-                    // UI 스레드에서 WriteableBitmap 업데이트
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        writeableBitmap1.Freeze();
-                        ImageView.Source = writeableBitmap1;
                     });
                 }
                 catch (Exception ex)
@@ -376,19 +418,19 @@ namespace WpfApp2
                 finally
                 {
                     // 처리중 숨기기
-                    LoadingPanel.Visibility = Visibility.Collapsed;
+                    ViewModel.IsLoading = false;
 
                     // 그레이스케일 버튼 비활성화
-                    GrayScaleButton.IsEnabled = false;
+                    //GrayScaleButton.IsEnabled = false;
                     // 캐니엣지 버튼 비활성화
-                    CannyEdgeButton.IsEnabled = false;
+                    //CannyEdgeButton.IsEnabled = false;
                     // 욜로v5 버튼 활성화
-                    YoloV5Button.IsEnabled = false;
+                    //YoloV5Button.IsEnabled = false;
                 }
             }
             else
             {
-                MessageBox.Show("그레이스케일 이미지가 필요합니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("이미지가 필요합니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -407,13 +449,13 @@ namespace WpfApp2
             });
 
             // 픽셀데이터를 이미지로 저장
-            SaveBitmapToPng(writeableBitmap, inputImagePath);
+            WpfApp2.Util.FileUtils.SaveBitmapToPng(writeableBitmap, inputImagePath);
 
             // Yolov5 검출 로직
             var processStartInfo = new ProcessStartInfo
             {
                 FileName = "python",
-                Arguments = $"\"{pythonScriptPath}\" \"{inputImagePath}\" \"{outputImagePath}\"",
+                Arguments = $"\"{pythonScriptPath}\" --source \"{inputImagePath}\" --output \"{outputImagePath}\"",  // --source와 --output 옵션을 포함
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
@@ -423,25 +465,326 @@ namespace WpfApp2
                 process.WaitForExit(); // Python 스크립트 실행이 완료될 때까지 대기
             }
 
-            // 출력 이미지 픽셀 데이터로 변환
-            byte[] outputPixelData = LoadPngToPixels(outputImagePath, out width, out height);
+            // 'runs/detect' 폴더는 실행 폴더 내에 생성됩니다
+            string detectDir = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "runs", "detect");
 
-            // 최종 처리 시간 계산
-            var totalElapsedTime = DateTime.Now - startTime;
+            // 최신 expX 폴더 찾기 (expX 폴더 이름이 가장 큰 폴더 찾기)
+            var expFolders = Directory.GetDirectories(detectDir)
+                                       .OrderByDescending(d => new DirectoryInfo(d).Name)
+                                       .ToList();
+            byte[] outputPixelData = null;
 
-            // UI 스레드에서 픽셀 데이터를 다시 씀
-            Application.Current.Dispatcher.Invoke(() =>
+            try
             {
-                writeableBitmap.Lock();
-                writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), outputPixelData, width * 4, 0);
-                writeableBitmap.Unlock();
+                if (expFolders.Any())
+                {
+                    string latestFolder = expFolders.First(); // 최신 폴더
 
-                ProcessTimeTextBlock.Text = $"욜로v5객체감지 처리 시간: {totalElapsedTime.TotalSeconds:F2}초";
-            });
+                    // 최신 폴더에서 yolov5_input_image.jpg 파일 찾기
+                    string resultImageFile = System.IO.Path.Combine(latestFolder, "yolov5_input_image.jpg");
+
+                    if (File.Exists(resultImageFile))
+                    {
+                        // 결과 이미지 로드
+                        outputPixelData = WpfApp2.Util.FileUtils.LoadPngToPixels(resultImageFile, out width, out height);
+                    }
+                    else
+                    {
+                        throw new FileNotFoundException("결과 이미지 파일이 존재하지 않습니다.", resultImageFile);
+                    }
+                }
+                else
+                {
+                    throw new DirectoryNotFoundException("YoloV5 결과 폴더가 존재하지 않습니다.");
+                }
+
+                // 최종 처리 시간 계산
+                var totalElapsedTime = DateTime.Now - startTime;
+
+                // UI 스레드에서 픽셀 데이터를 다시 씀
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (outputPixelData != null)
+                    {
+                        writeableBitmap.Lock();
+                        writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), outputPixelData, width * 4, 0);
+                        writeableBitmap.Unlock();
+
+                        ProcessTimeTextBlock.Text = $"욜로v5 객체 감지 처리 시간: {totalElapsedTime.TotalSeconds:F2}초";
+                    }
+                    else
+                    {
+                        ProcessTimeTextBlock.Text = "이미지 파일을 로드할 수 없습니다.";
+                    }
+                });
+            }
+            catch (DirectoryNotFoundException dirEx)
+            {
+                // 디렉토리가 없을 경우
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ProcessTimeTextBlock.Text = $"에러: {dirEx.Message}";
+                });
+            }
+            catch (FileNotFoundException fileEx)
+            {
+                // 파일이 없을 경우
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ProcessTimeTextBlock.Text = $"에러: {fileEx.Message}";
+                });
+            }
+            catch (Exception ex)
+            {
+                // 기타 예외 처리
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ProcessTimeTextBlock.Text = $"예상치 못한 오류가 발생했습니다: {ex.Message}";
+                });
+            }
         }
 
+        private async void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            string rootPath = System.IO.Path.Combine(Environment.CurrentDirectory, "runs"); // 실팽폴더 내의 rus 폴더 경로
+
+            // 폴더가 존재하는지 확인
+            if (Directory.Exists(rootPath))
+            {
+                try
+                {
+                    
+                    // 하위 파일과 폴더를 재귀적으로 삭제하는 함수 호출
+                    await WpfApp2.Util.FileUtils.DeleteDirectoryAsync(rootPath);
+
+                    // 삭제가 완료되면 메시지 박스 또는 다른 방법으로 알림
+                    MessageBox.Show("모두 삭제했습니다.");
+                }
+                catch (Exception ex)
+                {
+                    // 오류 발생 시 오류 메시지 표시
+                    MessageBox.Show($"오류가 발생했습니다: {ex.Message}");
+                }
+            }
+            else
+            {
+                MessageBox.Show("rus 폴더가 존재하지 않습니다.");
+            }
+
+            
+        }
+
+    }
+}
+
+- ViewModels/MainViewModel.cs
+using System.ComponentModel;
+
+namespace WpfApp2.ViewModels
+{
+    public class MainViewModel : INotifyPropertyChanged
+    {
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+
+- Converters/BoolToVisibilityConverter.cs
+using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+
+namespace WpfApp2.Converters
+{
+    // true -> Visible
+    // false -> Collapsed
+
+    public class BoolToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if(value is bool booleanValue) 
+                return booleanValue ? Visibility.Visible : Visibility.Collapsed;
+
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if(value is Visibility visibility)
+                return visibility == Visibility.Visible;
+
+            return false;
+        }
+    }
+}
+
+-ImageProcessing/ CannyEdge.cs
+using System;
+using System.Windows.Media.Imaging;
+using System.Windows;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+
+namespace WpfApp2.ImageProcessing
+{
+    public class CannyEdgeProcessor
+    {
+        public async Task<WriteableBitmap> ApplyCannyEdgeDetectionAsync(WriteableBitmap writeableBitmap, TextBlock processTimeTextBlock)
+        {
+            int width = writeableBitmap.PixelWidth;
+            int height = writeableBitmap.PixelHeight;
+
+            var pixelData = new byte[width * height * 4];
+            writeableBitmap.CopyPixels(pixelData, width * 4, 0);
+
+            var gradientData = new byte[width * height];
+
+            int[] gx = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
+            int[] gy = { -1, -2, -1, 0, 0, 0, 1, 2, 1 };
+
+            var startTime = DateTime.Now;
+
+            await Task.Run(() =>
+            {
+                Parallel.For(1, height - 1, y =>
+                {
+                    for (int x = 1; x < width - 1; x++)
+                    {
+                        int pixelIndex = (y * width + x) * 4;
+                        double gradX = 0;
+                        double gradY = 0;
+
+                        for (int ky = -1; ky <= 1; ky++)
+                        {
+                            for (int kx = -1; kx <= 1; kx++)
+                            {
+                                int neighborIndex = ((y + ky) * width + (x + kx)) * 4;
+                                byte intensity = pixelData[neighborIndex];
+                                gradX += intensity * gx[(ky + 1) * 3 + (kx + 1)];
+                                gradY += intensity * gy[(ky + 1) * 3 + (kx + 1)];
+                            }
+                        }
+
+                        double gradientMagnitude = Math.Sqrt(gradX * gradX + gradY * gradY);
+                        gradientData[y * width + x] = (byte)(gradientMagnitude > 128 ? 255 : 0);
+                    }
+                });
+            });
+
+            await Task.Run(() =>
+            {
+                Parallel.For(0, height, y =>
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        int pixelIndex = (y * width + x) * 4;
+                        byte edge = gradientData[y * width + x];
+                        pixelData[pixelIndex] = edge;
+                        pixelData[pixelIndex + 1] = edge;
+                        pixelData[pixelIndex + 2] = edge;
+                    }
+                });
+            });
+
+            var totalElapsedTime = DateTime.Now - startTime;
+
+            writeableBitmap.Lock();
+            writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixelData, width * 4, 0);
+            writeableBitmap.Unlock();
+
+            processTimeTextBlock.Text = $"캐니엣지 처리 시간: {totalElapsedTime.TotalSeconds:F2}초";
+            return writeableBitmap;
+        }
+    }
+}
+
+- ImageProcessing/GrayScale.cs
+using System;
+using System.Windows.Media.Imaging;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace WpfApp2.ImageProcessing
+{
+    public class GrayscaleProcessor
+    {
+        public async Task<WriteableBitmap> ConvertToGrayScaleAsync(BitmapImage bitmapImage, TextBlock processTimeTextBlock)
+        {
+            int width = bitmapImage.PixelWidth;
+            int height = bitmapImage.PixelHeight;
+            var writeableBitmap = new WriteableBitmap(bitmapImage);
+            var pixelData = new byte[width * height * 4];
+
+            writeableBitmap.CopyPixels(pixelData, width * 4, 0);
+
+            var startTime = DateTime.Now;
+
+            await Task.Run(() =>
+            {
+                Parallel.For(0, height, y =>
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        int pixelIndex = (y * width + x) * 4;
+                        byte a = pixelData[pixelIndex + 3];
+                        byte r = pixelData[pixelIndex + 2];
+                        byte g = pixelData[pixelIndex + 1];
+                        byte b = pixelData[pixelIndex];
+
+                        byte gray = (byte)(0.3 * r + 0.59 * g + 0.11 * b);
+
+                        pixelData[pixelIndex + 3] = a;    // Alpha
+                        pixelData[pixelIndex + 2] = gray; // Red
+                        pixelData[pixelIndex + 1] = gray; // Green
+                        pixelData[pixelIndex] = gray;     // Blue
+                    }
+                });
+            });
+
+            var totalElapsedTime = DateTime.Now - startTime;
+
+            writeableBitmap.Lock();
+            writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixelData, width * 4, 0);
+            writeableBitmap.Unlock();
+
+            processTimeTextBlock.Text = $"그레이스케일 처리 시간: {totalElapsedTime.TotalSeconds:F2}초";
+            return writeableBitmap;
+        }
+    }
+}
+
+-Util/FileUtils.cs
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
+using System.Windows;
+using System.Windows.Media;
+
+namespace WpfApp2.Util
+{
+    public class FileUtils
+    {
         // 이미지 파일로 저장하는 함수
-        private void SaveBitmapToPng(WriteableBitmap writeableBitmap, string filePath)
+        public static void SaveBitmapToPng(WriteableBitmap writeableBitmap, string filePath)
         {
             if (writeableBitmap == null)
                 throw new ArgumentNullException(nameof(writeableBitmap), "WriteableBitmap이 null입니다.");
@@ -474,22 +817,17 @@ namespace WpfApp2
             }
         }
 
-
-
         // 이미지 파일을 로드하여 픽셀 데이터를 반환하는 함수
-        private byte[] LoadPngToPixels(string filePath, out int width, out int height)
+        public static byte[] LoadPngToPixels(string filePath, out int width, out int height)
         {
             try
             {
-                if (!File.Exists(filePath))
+                if (!System.IO.File.Exists(filePath))
                 {
                     MessageBox.Show($"파일을 찾을 수 없습니다: {filePath}");
                     width = height = 0;
                     return null;
                 }
-
-                // PNG 파일이 완전히 저장될 때까지 대기
-                WaitForFile(filePath);
 
                 var bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
@@ -499,13 +837,7 @@ namespace WpfApp2
                 bitmapImage.EndInit();
                 bitmapImage.Freeze(); // 스레드 안전 처리
 
-                WriteableBitmap writeableBitmap = null;
-
-                // UI 스레드에서 WriteableBitmap 생성
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    writeableBitmap = new WriteableBitmap(bitmapImage);
-                });
+                WriteableBitmap writeableBitmap = new WriteableBitmap(bitmapImage);
 
                 width = writeableBitmap.PixelWidth;
                 height = writeableBitmap.PixelHeight;
@@ -525,599 +857,54 @@ namespace WpfApp2
             }
         }
 
-        // 파일이 완전히 저장될 때까지 대기하는 함수
-        private void WaitForFile(string filePath)
+        // 폴더 및 하위 파일 삭제
+        public static async Task DeleteDirectoryAsync(string path)
         {
-            int retryCount = 0;
-            while (retryCount < 5)
+            // 폴더 내의 모든 파일 삭제
+            foreach (string file in Directory.GetFiles(path))
             {
                 try
                 {
-                    using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
-                    {
-                        return; // 파일을 성공적으로 열면 종료
-                    }
+                    System.IO.File.Delete(file);
                 }
-                catch (IOException)
+                catch (Exception ex)
                 {
-                    Thread.Sleep(200); // 200ms 대기 후 재시도
-                    retryCount++;
+                    MessageBox.Show($"파일 삭제 오류: {ex.Message}");
                 }
             }
-        }
 
+            // 폴더 내의 모든 하위 폴더 삭제 (재귀적으로)
+            foreach (string subDir in Directory.GetDirectories(path))
+            {
+                await DeleteDirectoryAsync(subDir); // 재귀 호출
+            }
+
+            // 최종적으로 폴더 자체 삭제
+            Directory.Delete(path);
+        }
     }
 }
 
-cuda version
-c:\>nvidia-smi
-Thu Jan 30 20:05:58 2025
-+-----------------------------------------------------------------------------------------+
-| NVIDIA-SMI 566.14                 Driver Version: 566.14         CUDA Version: 12.7     |
-|-----------------------------------------+------------------------+----------------------+
-| GPU  Name                  Driver-Model | Bus-Id          Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
-|                                         |                        |               MIG M. |
-|=========================================+========================+======================|
-|   0  NVIDIA GeForce RTX 4060 ...  WDDM  |   00000000:01:00.0 Off |                  N/A |
-| N/A   45C    P8              2W /   85W |       1MiB /   8188MiB |      0%      Default |
-|                                         |                        |                  N/A |
-+-----------------------------------------+------------------------+----------------------+
+2) Python
+c:\yolov5result\yolov5_inference.py
+from pathlib import Path
+import torch  # YOLOv5는 PyTorch 기반이므로 torch 임포트 필요
 
-+-----------------------------------------------------------------------------------------+
-| Processes:                                                                              |
-|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
-|        ID   ID                                                               Usage      |
-|=========================================================================================|
-|  No running processes found                                                             |
-+-----------------------------------------------------------------------------------------+
+def run_inference(source, output):
+    # YOLOv5 모델 로드
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path=r"C:\yolov5)back20250130\runs\train\exp34\weights\best.pt")  # 경로에서 \를 raw 문자열로 처리
+    
+    # 예측 수행
+    results = model(source)  # 이미지 경로를 넣으면 결과가 나옵니다.
+    
+    # 결과 저장
+    results.save(Path(output).parent)  # 저장 디렉터리만 지정, 파일명은 자동으로 생성
 
-NVIDIA 드라이버 버전	566.14
-CUDA 버전	12.7
-GPU 모델	NVIDIA GeForce RTX 4060
-GPU 메모리	8GB (8188MiB)
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", required=True, help="Input image path")
+    parser.add_argument("--output", required=True, help="Output image path")
+    args = parser.parse_args()
 
-torch 버전
-c:\>python -c "import torch; print(torch.__version__)"
-2.6.0+cpu
-=> GPU 지원 버전의 PyTorch 설치
-c:\>pip uninstall torch
-c:\>pip install torch==2.6.0+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
-c:\>python -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.current_device()); print(torch.cuda.get_device_name(torch.cuda.current_device()))"
-2.6.0+cu118
-True
-0
-NVIDIA GeForce RTX 4060 Laptop GPU
-
-ultralytics 버전
-c:\>python -c "import ultralytics; print(ultralytics.__version__)"
-8.3.69
-
-c:\>python --version
-Python 3.13.0
-
-yolov5설치 및 업그레이드
-c:\>git clone https://github.com/ultralytics/yolov5.git
-c:\>cd yolov5
-c:\yolov5>pip install -U -r requirements.txt
-c:\yolov5>python.exe -m pip install --upgrade pip
-c:\yolov5>pip install --upgrade ultralytics
-c:\yolov5>pip install --upgrade torch
-
-테스트
-C:\wpfProject\WpfApp2\WpfApp2\bin\Debug\net8.0-windows>python "C:\yolov5result\yolov5_inference.py" --source "C:\yolov5\yolov5_input_image.png" --output "C:\yolov5\yolov5_output_image.png"    
-
-오류
-C:\wpfProject\WpfApp2\WpfApp2\bin\Debug\net8.0-windows>python "C:\yolov5result\yolov5_inference.py" --source "C:\yolov5\yolov5_input_image.png" --output "C:\yolov5\yolov5_output_image.png"
-Traceback (most recent call last):
-  File "C:\yolov5result\yolov5_inference.py", line 24, in <module>
     run_inference(args.source, args.output)
-    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\yolov5result\yolov5_inference.py", line 10, in run_inference
-    results = model.predict(source)  # predict로 변경, verbose 인자 제거
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python313\Lib\site-packages\ultralytics\engine\model.py", line 551, in predict
-    self.predictor.setup_model(model=self.model, verbose=is_cli)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python313\Lib\site-packages\ultralytics\engine\predictor.py", line 310, in setup_model
-    self.model = AutoBackend(
-                 ~~~~~~~~~~~^
-        weights=model or self.args.model,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<6 lines>...
-        verbose=verbose,
-        ^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\utils\_contextlib.py", line 116, in decorate_context
-    return func(*args, **kwargs)
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python313\Lib\site-packages\ultralytics\nn\autobackend.py", line 152, in __init__
-    model = model.fuse(verbose=verbose)
-TypeError: BaseModel.fuse() got an unexpected keyword argument 'verbose'
-
-=> PyTorch 및 ultralytics와 같은 딥러닝 관련 라이브러리들은 Python 3.8 또는 Python 3.9 python 3.9버전으로 설치하는 것이 안정적
-python 3.13.0 제어판 > 프로그림 및 기능 > 제거
-python 3.9 다운로드 후 설치(https://www.python.org/downloads/release/python-390/)
-Windows x86 executable installer	Windows     python-3.9.0.exe
-
-시스템 환경 변수 설정
-시스템환경변수편집 > 고급 > 환경변수 > 시스템 변수 > 
-PYTHONPATH : C:\Users\nayou\AppData\Local\Programs\Python\Python39-32;C:\Users\nayou\AppData\Local\Programs\Python\Python39-32\Scripts
-Path : %PYTHONPATH%;...
-
-파이썬 버전 확인
-c:\>python --version
-Python 3.9.0
-
-욜로설치
-c:\yolov5>pip install -r requrements.txt
-
-pip 최신 버전 설치
-c:\yolov5>c:\users\nayou\appdata\local\programs\python\python39-32\python.exe -m pip install --upgrade pip
-Collecting pip
-
-numpy 설치
-c:\>pip install numpy
-c:\>pip install numpy
-Requirement already satisfied: numpy in c:\users\nayou\appdata\local\programs\python\python39-32\lib\site-packages (2.0.2)
-
-scipy 설치
-c:\>pip install scipy
-
-c:\>where python
-c:\msys64\mingw64\bin\python.exe
-C:\Users\nayou\AppData\Local\Microsoft\WindowsApps\python.exe
-
-두 위치에 기존 python.exe를 제거하고
-C:\Users\nayou\AppData\Local\Programs\Python\Python39
-python.exe
-python39.dll
-을 복사해서 넣는다
-
-c:\>python --version
-Python 3.9.0
-
-c:\>py --version
-Python 3.9.0
-
-c:\>pip install scipy
-'pip'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
-배치 파일이 아닙니다.
-
-c:\>python -m pip --version
-pip 25.0 from C:\Users\nayou\AppData\Local\Programs\Python\Python39-32\lib\site-packages\pip (python 3.9)
-
-c:\>python -m pip install scipy
-오류류
-Collecting scipy
-  Using cached scipy-1.13.1.tar.gz (57.2 MB)
-  Installing build dependencies ... done
-  Getting requirements to build wheel ... done
-  Preparing metadata (pyproject.toml) ... error
-  error: subprocess-exited-with-error
-
-  × Preparing metadata (pyproject.toml) did not run successfully.
-  │ exit code: 1
-  ╰─> [31 lines of output]
-      + meson setup C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02 C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02\.mesonpy-38w5kk43 -Dbuildtype=release -Db_ndebug=if-release -Db_vscrt=md --native-file=C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02\.mesonpy-38w5kk43\meson-python-native-file.ini
-      The Meson build system
-      Version: 1.7.0
-      Source dir: C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02
-      Build dir: C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02\.mesonpy-38w5kk43
-      Build type: native build
-      Project name: scipy
-      Project version: 1.13.1
-      C compiler for the host machine: cl (msvc 19.29.30158 "x86용 Microsoft (R) C/C++ 최적화 컴파일러 버전 19.29.30158")
-      C linker for the host machine: link link 14.29.30158.0
-      C++ compiler for the host machine: cl (msvc 19.29.30158 "x86용 Microsoft (R) C/C++ 최적화 컴파일러 버전 19.29.30158")
-      C++ linker for the host machine: link link 14.29.30158.0
-      Cython compiler for the host machine: cython (cython 3.0.11)
-      Host machine cpu family: x86
-      Host machine cpu: x86
-      Program python found: YES (c:\msys64\mingw64\bin\python.exe)
-      Run-time dependency python found: YES 3.9
-      Program cython found: YES (C:\Users\nayou\AppData\Local\Temp\pip-build-env-7psmfzwm\overlay\Scripts\cython.EXE)
-      Compiler for C supports arguments -Wno-unused-but-set-variable: NO
-      Compiler for C supports arguments -Wno-unused-function: NO
-      Compiler for C supports arguments -Wno-conversion: NO
-      Compiler for C supports arguments -Wno-misleading-indentation: NO
-      Library m found: NO
-
-      ..\meson.build:78:0: ERROR: Unable to detect linker for compiler `gfortran -Wl,--version`
-      stdout:
-      stderr: gfortran: fatal error: '-fuse-linker-plugin', but liblto_plugin.dll not found
-      compilation terminated.
-
-
-      A full log can be found at C:\Users\nayou\AppData\Local\Temp\pip-install-h381g5d2\scipy_4b19255a0132492a9dba12edbe3d1c02\.mesonpy-38w5kk43\meson-logs\meson-log.txt
-      [end of output]
-
-  note: This error originates from a subprocess, and is likely not a problem with pip.
-error: metadata-generation-failed
-
-× Encountered error while generating package metadata.
-╰─> See above for output.
-
-note: This is an issue with the package mentioned above, not pip.
-hint: See above for details.
-
-수정
-gfortran 컴파일러와 관련된 liblto_plugin.dll 파일이 누락
-
-MSYS2에서 작업
-패키지 목록 최신으로 업데이트
-nayou@nayoungkim MINGW64 ~
-# pacman -Syu
-
-패키지 이름 확인
-nayou@nayoungkim MINGW64 ~
-# pacman -Ss gfortran
-mingw32/mingw-w64-i686-gcc-libgfortran 14.2.0-2
-    GNU Compiler Collection (libgfortran) for MinGW-w64
-mingw64/mingw-w64-x86_64-gcc-libgfortran 14.2.0-2
-    GNU Compiler Collection (libgfortran) for MinGW-w64
-ucrt64/mingw-w64-ucrt-x86_64-gcc-libgfortran 14.2.0-2
-    GNU Compiler Collection (libgfortran) for MinGW-w64
-
-Fortran 컴파일러 설치
-nayou@nayoungkim MINGW64 ~
-# pacman -S mingw-w64-x86_64-gcc-libgfortran
-의존성 해결 중...
-꾸러미 충돌을 찾는 중...
-
-꾸러미 (1) mingw-w64-x86_64-gcc-libgfortran-14.2.0-2
-
-총 다운로드 크기:  0.89 MiB
-총 설치 크기:      3.27 MiB
-
-:: 설치를 진행하시겠습니까? [Y/n] y
-:: 꾸러미 가져오는 중...
- mingw-w64-x86_64-gcc-l...   910.3 KiB   193 KiB/s 00:05 [#############################] 100%
-(1/1) 키링의 키를 검사 중                                [#############################] 100%
-(1/1) 꾸러미 무결성 검사 중                              [#############################] 100%
-(1/1) 꾸러미 파일 불러오는 중                            [#############################] 100%
-(1/1) 파일 충돌 검사 중                                  [#############################] 100%
-오류: 커밋 트랜잭션에 실패했습니다(파일이 충돌합니다.)
-mingw-w64-x86_64-gcc-libgfortran: /mingw64/bin/libgfortran-5.dll가 파일 시스템에 있습니다
-오류가 발생하여 업그레이드한 꾸러미가 없습니다.
-nayou@nayoungkim MINGW64 ~
-# rm /mingw64/bin/libgfortran-5.dll
-pacman -S mingw-w64-x86_64-gcc-libgfortran
-의존성 해결 중...
-꾸러미 충돌을 찾는 중...
-
-꾸러미 (1) mingw-w64-x86_64-gcc-libgfortran-14.2.0-2
-
-총 설치 크기:  3.27 MiB
-
-:: 설치를 진행하시겠습니까? [Y/n] y
-(1/1) 키링의 키를 검사 중                                [#############################] 100%
-(1/1) 꾸러미 무결성 검사 중                              [#############################] 100%
-(1/1) 꾸러미 파일 불러오는 중                            [#############################] 100%
-(1/1) 파일 충돌 검사 중                                  [#############################] 100%
-(1/1) 사용 가능한 디스크 공간 검사 중                    [#############################] 100%
-:: 꾸러미 변경사항을 처리 중...
-(1/1) 설치 중 mingw-w64-x86_64-gcc-libgfortran           [#############################] 100%
-
-nayou@nayoungkim MINGW64 ~
-# gfortran --version
-GNU Fortran (x86_64-win32-seh-rev0, Built by MinGW-Builds project) 14.2.0
-Copyright (C) 2024 Free Software Foundation, Inc.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-nayou@nayoungkim MINGW64 ~
-# pip install scipy
-오류
-Collecting scipy
-  Using cached scipy-1.13.1.tar.gz (57.2 MB)
-  Installing build dependencies ... done
-  Getting requirements to build wheel ... done
-  Preparing metadata (pyproject.toml) ... error
-  error: subprocess-exited-with-error
-
-  × Preparing metadata (pyproject.toml) did not run successfully.
-  │ exit code: 1
-  ╰─> [22 lines of output]
-      + meson setup C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01 C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01\.mesonpy-l43zklre -Dbuildtype=release -Db_ndebug=if-release -Db_vscrt=md --native-file=C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01\.mesonpy-l43zklre\meson-python-native-file.ini
-      The Meson build system
-      Version: 1.7.0
-      Source dir: C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01
-      Build dir: C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01\.mesonpy-l43zklre
-      Build type: native build
-      Project name: scipy
-      Project version: 1.13.1
-      C compiler for the host machine: x86_64-w64-mingw32-gcc (gcc 14.2.0 "x86_64-w64-mingw32-gcc (Rev2, Built by MSYS2 project) 14.2.0")
-      C linker for the host machine: x86_64-w64-mingw32-gcc ld.bfd 2.43.1
-      C++ compiler for the host machine: x86_64-w64-mingw32-g++ (gcc 14.2.0 "x86_64-w64-mingw32-g++ (Rev2, Built by MSYS2 project) 14.2.0")
-      C++ linker for the host machine: x86_64-w64-mingw32-g++ ld.bfd 2.43.1
-      Cython compiler for the host machine: cython (cython 3.0.11)
-      Host machine cpu family: x86_64
-      Host machine cpu: x86_64
-      Program python found: YES (c:\users\nayou\appdata\local\programs\python\python39-32\python.exe)
-      Need python for x86_64, but found x86
-      Run-time dependency python found: NO (tried sysconfig)
-
-      ..\meson.build:22:14: ERROR: Python dependency not found
-
-      A full log can be found at C:\msys64\tmp\pip-install-taq9vg20\scipy_0f9ec79c595949dcbf209065dc45be01\.mesonpy-l43zklre\meson-logs\meson-log.txt
-      [end of output]
-
-  note: This error originates from a subprocess, and is likely not a problem with pip.
-error: metadata-generation-failed
-
-× Encountered error while generating package metadata.
-╰─> See above for output.
-
-note: This is an issue with the package mentioned above, not pip.
-hint: See above for details.
-수정
-
-Python 3.9 32bit -> 64bit로 재설치
-Python 3.9.5 Windows Installer 64bit 설치
-https://www.python.org/downloads/release/python-395/
-Windows installer (64-bit)	Windows	Recommended	53a354a15baed952ea9519a7f4d87c3f	27.1 MB	SIG
-환경변수, where 경로등을 변경하여 준다
-
-nayou@nayoungkim MINGW64 ~
-# pip install scipy
-Collecting scipy
-  Downloading scipy-1.13.1-cp39-cp39-win_amd64.whl (46.2 MB)
-     |████████████████████████████████| 46.2 MB 6.4 MB/s
-Collecting numpy<2.3,>=1.22.4
-  Downloading numpy-2.0.2-cp39-cp39-win_amd64.whl (15.9 MB)
-     |████████████████████████████████| 15.9 MB 6.8 MB/s
-Installing collected packages: numpy, scipy
-Successfully installed numpy-2.0.2 scipy-1.13.1
-WARNING: You are using pip version 21.1.1; however, version 25.0 is available.
-You should consider upgrading via the 'c:\users\nayou\appdata\local\programs\python\python39\python.exe -m pip install --upgrade pip' command.
-
-nayou@nayoungkim MINGW64 ~
-# python  -m pip install --upgrade pip
-Requirement already satisfied: pip in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (21.1.1)
-Collecting pip
-  Using cached pip-25.0-py3-none-any.whl (1.8 MB)
-Installing collected packages: pip
-  Attempting uninstall: pip
-    Found existing installation: pip 21.1.1
-    Uninstalling pip-21.1.1:
-      Successfully uninstalled pip-21.1.1
-Successfully installed pip-25.0
-
-nayou@nayoungkim MINGW64 ~
-# pip install scipy
-Requirement already satisfied: scipy in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (1.13.1)
-Requirement already satisfied: numpy<2.3,>=1.22.4 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from scipy) (2.0.2)
-
-nayou@nayoungkim MINGW64 ~
-# pip uninstall scipy
-Found existing installation: scipy 1.13.1
-Uninstalling scipy-1.13.1:
-  Would remove:
-    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy-1.13.1-cp39-cp39-win_amd64.whl
-    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy-1.13.1.dist-info\*
-    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy.libs\.load-order-scipy-1.13.1
-    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy.libs\libopenblas_v0.3.27--3aa239bc726cfb0bd8e5330d8d4c15c6.dll
-    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\scipy\*
-Proceed (Y/n)? y
-  Successfully uninstalled scipy-1.13.1
-
-nayou@nayoungkim MINGW64 ~
-# pip install scipy
-Collecting scipy
-  Downloading scipy-1.13.1-cp39-cp39-win_amd64.whl.metadata (60 kB)
-Requirement already satisfied: numpy<2.3,>=1.22.4 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from scipy) (2.0.2)
-Downloading scipy-1.13.1-cp39-cp39-win_amd64.whl (46.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 46.2/46.2 MB 9.9 MB/s eta 0:00:00
-Installing collected packages: scipy
-Successfully installed scipy-1.13.1
-
-다시 yolov5 설정
-c:\>cd yolov5
-c:\yolov5>pip install -U -r requirements.txt
-c:\yolov5>python.exe -m pip install --upgrade pip
-c:\yolov5>pip install --upgrade ultralytics
-c:\yolov5>pip install --upgrade torch
-
-테스트
-C:\wpfProject\WpfApp2\WpfApp2\bin\Debug\net8.0-windows>python "C:\yolov5result\yolov5_inference.py" --source "C:\yolov5\yolov5_input_image.png" --output "C:\yolov5\yolov5_output_image.png" 
-
-C:\wpfProject\WpfApp2\WpfApp2\bin\Debug\net8.0-windows>python "C:\yolov5result\yolov5_inference.py" --source "C:\yolov5\yolov5_input_image.png" --output "C:\yolov5\yolov5_output_image.png"
-WARNING ⚠️ C:\yolov5result\exp23\weights\best.pt appears to require 'dill', which is not in Ultralytics requirements.
-AutoInstall will run now for 'dill' but this feature will be removed in the future.
-Recommend fixes are to train a new model using the latest 'ultralytics' package or to run a command with an official Ultralytics model, i.e. 'yolo predict model=yolo11n.pt'
-requirements: Ultralytics requirement ['dill'] not found, attempting AutoUpdate...
-Collecting dill
-  Downloading dill-0.3.9-py3-none-any.whl.metadata (10 kB)
-Downloading dill-0.3.9-py3-none-any.whl (119 kB)
-Installing collected packages: dill
-Successfully installed dill-0.3.9
-
-requirements: AutoUpdate success ✅ 0.8s, installed 1 package: ['dill']
-requirements: ⚠️ Restart runtime or rerun command for updates to take effect
-
-Traceback (most recent call last):
-  File "C:\yolov5result\yolov5_inference.py", line 24, in <module>
-    run_inference(args.source, args.output)
-  File "C:\yolov5result\yolov5_inference.py", line 10, in run_inference
-    results = model.predict(source)  # predict로 변경, verbose 인자 제거
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\ultralytics\engine\model.py", line 551, in predict
-    self.predictor.setup_model(model=self.model, verbose=is_cli)
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\ultralytics\engine\predictor.py", line 310, in setup_model
-    self.model = AutoBackend(
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\torch\utils\_contextlib.py", line 116, in decorate_context
-    return func(*args, **kwargs)
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\ultralytics\nn\autobackend.py", line 152, in __init__
-    model = model.fuse(verbose=verbose)
-TypeError: fuse() got an unexpected keyword argument 'verbose'
-
-MSYS2
-pip uninstall ultralytics
-pip uninstall torch
-pip install ultralytics==8.0.40  # ultralytics의 특정 버전으로 설치 
-pip install torch==1.13.1  # 호환되는 torch 버전으로 설치
-
-ultralytics --version 
-ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
-
-nayou@nayoungkim MINGW64 ~
-# pip uninstall opencv-python
-pip install opencv-python
-Found existing installation: opencv-python 4.11.0.86
-Uninstalling opencv-python-4.11.0.86:
-  Would remove:
-    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\cv2\*
-    c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages\opencv_python-4.11.0.86.dist-info\*
-Proceed (Y/n)? y
-  Successfully uninstalled opencv-python-4.11.0.86
-Collecting opencv-python
-  Using cached opencv_python-4.11.0.86-cp37-abi3-win_amd64.whl.metadata (20 kB)
-Requirement already satisfied: numpy>=1.17.0 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from opencv-python) (2.0.2)
-Using cached opencv_python-4.11.0.86-cp37-abi3-win_amd64.whl (39.5 MB)
-Installing collected packages: opencv-python
-Successfully installed opencv-python-4.11.0.86
-
-nayou@nayoungkim MINGW64 ~
-# ultralytics --version
-ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
-
-nayou@nayoungkim MINGW64 ~
-# pip install opencv-python
-Collecting opencv-python
-  Using cached opencv_python-4.11.0.86-cp37-abi3-win_amd64.whl.metadata (20 kB)
-Requirement already satisfied: numpy>=1.17.0 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from opencv-python) (2.0.2)
-Using cached opencv_python-4.11.0.86-cp37-abi3-win_amd64.whl (39.5 MB)
-Installing collected packages: opencv-python
-Successfully installed opencv-python-4.11.0.86
-
-nayou@nayoungkim MINGW64 ~
-# pip install opencv-contrib-python
-Collecting opencv-contrib-python
-  Downloading opencv_contrib_python-4.11.0.86-cp37-abi3-win_amd64.whl.metadata (20 kB)
-Requirement already satisfied: numpy>=1.17.0 in c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages (from opencv-contrib-python) (2.0.2)
-Downloading opencv_contrib_python-4.11.0.86-cp37-abi3-win_amd64.whl (46.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 46.2/46.2 MB 9.5 MB/s eta 0:00:00
-Installing collected packages: opencv-contrib-python
-Successfully installed opencv-contrib-python-4.11.0.86
-
-nayou@nayoungkim MINGW64 ~
-# python -c "import cv2; print(cv2.__version__)"
-Traceback (most recent call last):
-  File "<string>", line 1, in <module>
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\cv2\__init__.py", line 181, in <module>
-    bootstrap()
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\lib\site-packages\cv2\__init__.py", line 153, in bootstrap
-    native_module = importlib.import_module("cv2")
-  File "C:\Users\nayou\AppData\Local\Programs\Python\Python39\Lib\importlib\__init__.py", line 127, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
-
-OpenCV는 Microsoft Visual C++ Redistributable에 의존
-https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
-설정 > 시스템 > 정보 > 64비트 운영 체제, x64 기반 프로세서
-X64	https://aka.ms/vs/17/release/vc_redist.x64.exe 다운로드 후 설치
-
-환경변수설정
-CV2 : C:\Users\nayou\AppData\Local\Programs\Python\Python39\Lib\site-packages\cv2
-Path : %CV2%;...
-
-cv2테스트
-nayou@nayoungkim MINGW64 ~
-$ python -c "import sys; print(sys.executable)"
-C:\msys64\mingw64\bin\python.exe
-
-nayou@nayoungkim MINGW64 ~
-$ python -c "import cv2; print(cv2.__version__)"
-ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
-
-nayou@nayoungkim MINGW64 ~
-$ /c/Users/nayou/AppData/Local/Programs/Python/Python39/python.exe -c "import cv2; print(cv2.__version__)"
-4.11.0
-
-nayou@nayoungkim MINGW64 ~
-$ which python
-/mingw64/bin/python
-
-~/.bashrc 환경변수 PATH 순서변경
-export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python39"  # Python 디렉토리 추가
-export PATH="$PATH:/c/Users/nayou/AppData/Local/Programs/Python/Python39/Scripts"  # Python 디렉토리 추가
-export PATH="$PATH:/mingw64/bin"
-
-nayou@nayoungkim MINGW64 ~
-$ which python
-/c/Users/nayou/AppData/Local/Programs/Python/Python39/python
-
-nayou@nayoungkim MINGW64 ~
-$  python -c "import cv2; print(cv2.__version__)"
-4.11.0
-
-C:\>python -c "import cv2; print(cv2.__version__)"
-4.11.0
-
-다시 ultralytics 버전 확인
-nayou@nayoungkim MINGW64 ~
-$ ultralytics --version
-ImportError: DLL load failed while importing cv2: 지정된 모듈을 찾을 수 없습니다.
-
-ultralytics가 제대로 설치되었는지 확인
-nayou@nayoungkim MINGW64 ~
-$ pip list | grep ultralytics
-ultralytics             8.0.40
-ultralytics-thop        2.0.14
-
-nayou@nayoungkim MINGW64 ~
-$ which ultralytics
-/c/Users/nayou/AppData/Local/Programs/Python/Python39/Scripts/ultralytics
-
-nayou@nayoungkim MINGW64 ~
-$ pip show ultralytics
-Name: ultralytics
-Version: 8.3.70
-Summary: Ultralytics YOLO 🚀 for SOTA object detection, multi-object tracking, instance segmentation, pose estimation and image classification.
-Home-page: https://ultralytics.com
-Author:
-Author-email: Glenn Jocher <glenn.jocher@ultralytics.com>, Jing Qiu <jing.qiu@ultralytics.com>
-License: AGPL-3.0
-Location: c:\users\nayou\appdata\local\programs\python\python39\lib\site-packages
-Requires: matplotlib, numpy, opencv-python, pandas, pillow, psutil, py-cpuinfo, pyyaml, requests, scipy, seaborn, torch, torchvision, tqdm, ultralytics-thop
-Required-by:
-
-nayou@nayoungkim MINGW64 ~
-$  python -c "import ultralytics; print(dir(ultralytics))"
-['ASSETS', 'FastSAM', 'NAS', 'RTDETR', 'SAM', 'SETTINGS', 'YOLO', 'YOLOWorld', '__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__', '__version__', 'cfg', 'checks', 'data', 'download', 'engine', 'hub', 'models', 'nn', 'os', 'settings', 'utils']
-
-nayou@nayoungkim MINGW64 ~
-$ python -m ultralytics.YOLO --version
-C:\Users\nayou\AppData\Local\Programs\Python\Python39\python.exe: No module named ultralytics.YOLO
-
-nayou@nayoungkim MINGW64 ~
-$  python -c "from ultralytics import YOLO; model=YOLO('yolov5n.pt'); print(model)"
-PRO TIP 💡 Replace 'model=yolov5n.pt' with new 'model=yolov5nu.pt'.
-YOLOv5 'u' models are trained with https://github.com/ultralytics/ultralytics and feature improved performance vs standard YOLOv5 models trained with https://github.com/ultralytics/yolov5.
-
-Downloading https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov5nu.pt to 'yolov5nu.pt'...
-100%|████████████████████████████████████████████████████████████████| 5.31M/5.31M [00:00<00:00, 10.5MB/s]
-YOLO(
-  (model): DetectionModel(
-    (model): Sequential(
-      (0): Conv(
-        (conv): Conv2d(3, 16, kernel_size=(6, 6), stride=(2, 2), padding=(2, 2), bias=False)
-        (bn): BatchNorm2d(16, eps=0.001, momentum=0.03, affine=True, track_running_stats=True)
-        (act): SiLU(inplace=True)
-      )
-      (1): Conv(
-        (conv): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
-        (bn): BatchNorm2d(32, eps=0.001, momentum=0.03, affine=True, track_running_stats=True)
-        (act): SiLU(inplace=True)
-      )
-...
-=> YOLO 모델이 성공적으로 로드되었으며, 다운로드가 완료된 후 모델 구조 정보가 출력됨 
-
-c:\yolov5>git describe --tags
-v7.0-398-g5cdad892
-
-v7.0: YOLOv5의 버전이 v7.0
-398: v7.0 태그 이후에 398개의 커밋이 더 진행되었다
-g5cdad892: 마지막 커밋의 해시 값의 일부
-
-테스트
-python "C:\yolov5result\yolov5_inference.py" --source "yolov5_input_image.png" --output "yolov5_output_image.png"
