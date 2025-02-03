@@ -76,9 +76,20 @@ Sqlcmd: 오류: Microsoft ODBC Driver 17 for SQL Server: Client unable to establ
 Sqlcmd: 오류: Microsoft ODBC Driver 17 for SQL Server: Client unable to establish connection due to prelogin failure.
 
 
+TITLE: Connect to Server
+------------------------------
+Cannot connect to NAYOUNGKIM.
+------------------------------
+ADDITIONAL INFORMATION:
+A connection was successfully established with the server, but then an error occurred during the pre-login handshake. (provider: Shared Memory Provider, error: 0 - 파이프의 다른 끝에 프로세스가 없습니다.) (Microsoft SQL Server, Error: 233)
+For help, click: https://docs.microsoft.com/sql/relational-databases/errors-events/mssqlserver-233-database-engine-error
+-----------------------------
+파이프의 다른 끝에 프로세스가 없습니다
 
-
-
+Win + R > services.msc > SQL Server (MSSQLSERVER) 실행 중 확인
+Win + R > SQLServerManager16.msc > SQL Server 네트워크 구성 > MSSQLSERVER의 프로토콜 > "Shared Memory", "Named Pipes", "TCP/IP" 모두 "사용(Enabled)"으로 변경
+Win + R > services.msc > SQL Server (MSSQLSERVER) 다시 시작
+Win + R > wf.msc > 인바운드 규칙(Inbound Rules) > 새 규칙 > 포트 > 다음 > TCP > 1433 > 다음 > 도메인, 개인, 공용 체크 > 다음 > SQL Server 1433 > 마침
 
 
 
