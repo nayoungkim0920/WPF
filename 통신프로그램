@@ -22,86 +22,115 @@ https://learn.microsoft.com/ko-kr/sql/ssms/download-sql-server-management-studio
 SSMS-Setup-ENU.exe 설치
 C:\Program Files (x86)\Microsoft SQL Server Management Studio 20
 
-로그인 에러
-TITLE: Connect to Server
-------------------------------
-Cannot connect to NAYOUNGKIM.
-------------------------------
-ADDITIONAL INFORMATION:
-A connection was successfully established with the server, but then an error occurred during the login process. (provider: SSL Provider, error: 0 - 신뢰되지 않은 기관에서 인증서 체인을 발급했습니다.) (Microsoft SQL Server, Error: -2146893019)
-For help, click: https://docs.microsoft.com/sql/relational-databases/errors-events/mssqlserver--2146893019-database-engine-error
-------------------------------
-신뢰되지 않은 기관에서 인증서 체인을 발급했습니다
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+새로운 기능 및 개선 사항에 대 한 최신 PowerShell을 설치 하세요! https://aka.ms/PSWindows
+PS C:\WINDOWS\system32> New-SelfSignedCertificate -DnsName "NAYOUNGKIM" -CertStoreLocation "Cert:\LocalMachine\My"
+>>
+   PSParentPath: Microsoft.PowerShell.Security\Certificate::LocalMachine\My
+Thumbprint                                Subject
+----------                                -------
+178F2565B31B1646111F050915180C30784D260A  CN=NAYOUNGKIM
 
-c:\>where sqlcmd
-C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\SQLCMD.EXE
+인증서 내보내기
+Win + R > certmgr.msc > 개인 > 인증서 > NAYOUNGKIM > 모든 작업 > 내보내기
+> 개인키포함 > 모든 인증서 포함 > 암호선택 > SHA-256 > NAYOUNGKIM_sqlSERVER_Cert.pfx 파일명 입력 > 내보내기
+개인키포함 : .pfx
+개인키미포함 : .cer
+"C:\Windows\System32\NAYOUNGKIM_sqlSERVER_Cert.pfx"
+openssl pkcs12 -in "C:\Windows\System32\NAYOUNGKIM_sqlSERVER_Cert.pfx" -out "C:\Windows\System32\NAYOUNGKIM_cert.cer" -nodes
+"C:\Windows\System32\NAYOUNGKIM_cert.cer"
+c:\>icacls "C:\Windows\System32\NAYOUNGKIM_cert.cer" /grant "NT Service\MSSQLSERVER:(R)"
+처리된 파일: C:\Windows\System32\NAYOUNGKIM_cert.cer
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
 
-CMD창 관리자권한으로 실행
-c:\>net start MSSQLSERVER
-c:\>sqlcmd -S localhost -E
-1> ALTER LOGIN sa ENABLE;
-2> GO
-1> ALTER LOGIN sa WITH PASSWORD = '****************';
-2> GO
+c:\>sqlcmd -S NAYOUNGKIM -E
 1> USE master;
 2> GO
 데이터베이스 컨텍스트가 'master'(으)로 변경되었습니다.
-1> EXEC sp_configure 'show advanced options', 1;
+1> CREATE CERTIFICATE NAYOUNGKIM_CERTIFICATE FROM FILE = 'C:\Windows\System32\NAYOUNGKIM_sqlSERVER_Cert.cer';
 2> GO
-구성 옵션 'show advanced options'이(가) 0에서 1(으)로 변경되었습니다. RECONFIGURE 문을 실행하여 설치하십시오.
-1> RECONFIGURE;
-2> GO
-1> EXEC sys.sp_configure N'show advanced options', 1;
-2> RECONFIGURE WITH OVERRIDE;
-3> EXEC sys.sp_configure N'authentication mode', 2; -- 1 = Windows 인증, 2 = SQL Server + Windows 인증
-4> RECONFIGURE WITH OVERRIDE;
+메시지 15208, 수준 16, 상태 19, 서버 nayoungkim, 줄 1
+인증서, 비대칭 키 또는 프라이빗 키 파일이 잘못되었거나 없거나 파일에 대한 사용 권한이 없습니다.
+1> EXIT
 
-Sql Server Configuration Manager 실행
-"C:\Windows\SysWOW64\SQLServerManager16.msc"
-SQL Server 네트워크 구성 >  MSSQLSERVER에 대한 프로토콜 > 속성 > 엄격한 암호화 강제 실행 > 예
+c:\Windows\System32>set OPENSSL_CONF=C:\Users\nayou\vcpkg\buildtrees\openssl\x64-windows-rel\apps\openssl.cnf
+c:\Windows\System32>openssl req -new -newkey rsa:2048 -days 365 -keyout NAYOUNGKIM_private_key.pem -out NAYOUNGKIM_cert.csr
+Country Name (2 letter code) [AU]:KR
+State or Province Name (full name) [Some-State]:Gyeonggi-do
+Locality Name (eg, city) []:Ansan
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:My Company
+Organizational Unit Name (eg, section) []:Development Team
+Common Name (e.g. server FQDN or YOUR name) []:NAYOUNGKIM
+Email Address []:nayoungkim0920@gmail.com
 
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:******************
+An optional company name []:MyCompanyName
+=> "C:\Windows\System32\NAYOUNGKIM_private_key.pem"
+
+디렉토리 권한 부여
+c:\>icacls C:\SQLSERVER_certs /grant "NT Service\MSSQLSERVER":RX
+처리된 파일: C:\SQLSERVER_certs
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
+
+인증서 파일에 권한 부여
+NT Service\MSSQLSERVER 권한부여
+c:\>icacls C:\SQLSERVER_certs\NAYOUNGKIM_cert.cer /grant "NT Service\MSSQLSERVER":R
+처리된 파일: C:\SQLSERVER_certs\NAYOUNGKIM_cert.cer
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
+c:\>icacls C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem /grant "NT Service\MSSQLSERVER":R
+처리된 파일: C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
+
+MSSQLSERVER 권한부여
+c:\>icacls C:\SQLSERVER_certs\NAYOUNGKIM_cert.cer /grant "NT Service\MSSQLSERVER":R
+처리된 파일: C:\SQLSERVER_certs\NAYOUNGKIM_cert.cer
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
+c:\>icacls C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem /grant "NT Service\MSSQLSERVER":R
+처리된 파일: C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
+
+MSSQLSERVER 재시작
 c:\>net stop MSSQLSERVER
 SQL Server (MSSQLSERVER) 서비스를 멈춥니다..
 SQL Server (MSSQLSERVER) 서비스를 잘 멈추었습니다.
-
 c:\>net start MSSQLSERVER
 SQL Server (MSSQLSERVER) 서비스를 시작합니다..
 SQL Server (MSSQLSERVER) 서비스가 잘 시작되었습니다.
 
-c:\>sqlcmd -S localhost -U sa -P "***************"
-Sqlcmd: 오류: Microsoft ODBC Driver 17 for SQL Server: Client unable to establish connection because an error was encountered during handshakes before login. Common causes include client attempting to connect to an unsupported version of SQL Server, server too busy to accept new connections or a resource limitation (memory or maximum allowed connections) on the server..
-Sqlcmd: 오류: Microsoft ODBC Driver 17 for SQL Server: Shared Memory Provider: 파이프의 다른 끝에 프로세스가 없습니다.
-.
-Sqlcmd: 오류: Microsoft ODBC Driver 17 for SQL Server: Client unable to establish connection.
-Sqlcmd: 오류: Microsoft ODBC Driver 17 for SQL Server: Client unable to establish connection due to prelogin failure.
+c:\Windows\System32>sqlcmd -S NAYOUNGKIM -E
+1>  USE master;
+2> GO
+데이터베이스 컨텍스트가 'master'(으)로 변경되었습니다.
 
+PowerShell(관리자 권한)에서 SQL Server 서비스 계정 확인
+PS C:\> Get-WmiObject -Query "SELECT StartName FROM Win32_Service WHERE Name='MSSQLSERVER'"
+__GENUS          : 2
+__CLASS          : Win32_Service
+__SUPERCLASS     :
+__DYNASTY        :
+__RELPATH        :
+__PROPERTY_COUNT : 1
+__DERIVATION     : {}
+__SERVER         :
+__NAMESPACE      :
+__PATH           :
+StartName        : NT Service\MSSQLSERVER
+PSComputerName   :
 
-TITLE: Connect to Server
-------------------------------
-Cannot connect to NAYOUNGKIM.
-------------------------------
-ADDITIONAL INFORMATION:
-A connection was successfully established with the server, but then an error occurred during the pre-login handshake. (provider: Shared Memory Provider, error: 0 - 파이프의 다른 끝에 프로세스가 없습니다.) (Microsoft SQL Server, Error: 233)
-For help, click: https://docs.microsoft.com/sql/relational-databases/errors-events/mssqlserver-233-database-engine-error
------------------------------
-파이프의 다른 끝에 프로세스가 없습니다
+PS C:\> Test-Path "C:\SQLSERVER_certs\NAYOUNGKIM_cert.cer"
+True
+PS C:\> Test-Path "C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem"
+True
 
-Win + R > services.msc > SQL Server (MSSQLSERVER) 실행 중 확인
-Win + R > SQLServerManager16.msc > SQL Server 네트워크 구성 > MSSQLSERVER의 프로토콜 > "Shared Memory", "Named Pipes", "TCP/IP" 모두 "사용(Enabled)"으로 변경
-Win + R > services.msc > SQL Server (MSSQLSERVER) 다시 시작
-Win + R > wf.msc > 인바운드 규칙(Inbound Rules) > 새 규칙 > 포트 > 다음 > TCP > 1433 > 다음 > 도메인, 개인, 공용 체크 > 다음 > SQL Server 1433 > 마침
-
-
-
-
-
-
-
-
-
-
-
-
+OpenSSL 설치
+https://slproweb.com/products/Win32OpenSSL.html
+Win64 OpenSSL v3.4.0  EXE | MSI	221MB Installer
+Win64OpenSSL-3_4_0.exe 설치
+C:\Program Files\OpenSSL-Win64
+Copy OpenSSL DLLs to : The OpenSSL binaries (/bin) directory 선택
 
 
 
