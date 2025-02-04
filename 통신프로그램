@@ -54,22 +54,6 @@ c:\>sqlcmd -S NAYOUNGKIM -E
 인증서, 비대칭 키 또는 프라이빗 키 파일이 잘못되었거나 없거나 파일에 대한 사용 권한이 없습니다.
 1> EXIT
 
-c:\Windows\System32>set OPENSSL_CONF=C:\Users\nayou\vcpkg\buildtrees\openssl\x64-windows-rel\apps\openssl.cnf
-c:\Windows\System32>openssl req -new -newkey rsa:2048 -days 365 -keyout NAYOUNGKIM_private_key.pem -out NAYOUNGKIM_cert.csr
-Country Name (2 letter code) [AU]:KR
-State or Province Name (full name) [Some-State]:Gyeonggi-do
-Locality Name (eg, city) []:Ansan
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:My Company
-Organizational Unit Name (eg, section) []:Development Team
-Common Name (e.g. server FQDN or YOUR name) []:NAYOUNGKIM
-Email Address []:nayoungkim0920@gmail.com
-
-Please enter the following 'extra' attributes
-to be sent with your certificate request
-A challenge password []:******************
-An optional company name []:MyCompanyName
-=> "C:\Windows\System32\NAYOUNGKIM_private_key.pem"
-
 디렉토리 권한 부여
 c:\>icacls C:\SQLSERVER_certs /grant "NT Service\MSSQLSERVER":RX
 처리된 파일: C:\SQLSERVER_certs
@@ -90,6 +74,22 @@ c:\>icacls C:\SQLSERVER_certs\NAYOUNGKIM_cert.cer /grant "NT Service\MSSQLSERVER
 1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
 c:\>icacls C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem /grant "NT Service\MSSQLSERVER":R
 처리된 파일: C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
+
+권한확인
+c:\>icacls C:\SQLSERVER_certs\NAYOUNGKIM_cert.cer
+C:\SQLSERVER_certs\NAYOUNGKIM_cert.cer NT SERVICE\MSSQLSERVER:(R)
+                                       BUILTIN\Administrators:(I)(F)
+                                       NT AUTHORITY\SYSTEM:(I)(F)
+                                       BUILTIN\Users:(I)(RX)
+                                       NT AUTHORITY\Authenticated Users:(I)(M)
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
+c:\>icacls C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem
+C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem NT SERVICE\MSSQLSERVER:(R)
+                                              BUILTIN\Administrators:(I)(F)
+                                              NT AUTHORITY\SYSTEM:(I)(F)
+                                              BUILTIN\Users:(I)(RX)
+                                              NT AUTHORITY\Authenticated Users:(I)(M)
 1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
 
 MSSQLSERVER 재시작
@@ -132,6 +132,47 @@ Win64OpenSSL-3_4_0.exe 설치
 C:\Program Files\OpenSSL-Win64
 Copy OpenSSL DLLs to : The OpenSSL binaries (/bin) directory 선택
 
+OpenSSL설치 버전 확인
+c:\>openssl version
+OpenSSL 3.4.0 22 Oct 2024 (Library: OpenSSL 3.4.0 22 Oct 2024)
 
+RSA 개인 키 생성
+c:\>openssl genpkey -algorithm RSA -out C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem
+...
 
+CSR(인증서 서명 요청) 생성
+c:\>openssl req -new -key C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem -out C:\SQLSERVER_certs\NAYOUNGKIM_certificate.csr
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:KR
+State or Province Name (full name) [Some-State]:**********
+Locality Name (eg, city) []:******
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:**********
+Organizational Unit Name (eg, section) []:************
+Common Name (e.g. server FQDN or YOUR name) []:NAYOUNGKIM
+Email Address []:nayoungkim0920@gmail.com
 
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:****************
+An optional company name []:MyCompanyName
+
+인증서 서명(자체 서명된 인증서 생성)
+c:\>openssl x509 -req -in C:\SQLSERVER_certs\NAYOUNGKIM_certificate.csr -signkey C:\SQLSERVER_certs\NAYOUNGKIM_private_key.pem -out C:\SQLSERVER_certs\NAYOUNGKIM_certificate.crt
+Certificate request self-signature ok
+subject=C=KR, ST=8, L=**********, O=***********, OU=***********, CN=NAYOUNGKIM, emailAddress=nayoungkim0920@gmail.com
+
+인증서 가져오기
+Win + R > certmgr.msc > 개인용 > 인증서 > 모든작업 > 가져오기 > NAYOUNGKIM_certificate.crt
+
+인증서 등록하기
+Win + R > sqlservermanager16.msc > SQL Server 네트워크 구성 > MSSQLSERVER에 대한 프로토콜 > 플래그 
+> 암호화 연결 사용 > 예
+> 인증서 > NAYOUNGKIM > 적용
+
+SQLSERVER 재시작
