@@ -220,23 +220,134 @@ Win + R > sqlservermanager16.msc > SQL Server 네트워크 구성 > MSSQLSERVER�
 
 실패..
 
+[SQL EXPRESS 설치 및 연결]
+Win + R > wf.msc > 인바운드 규칙 > 새 규칙 추가> 포트 > 다음 > TCP 1433, UDP 1433 > 다음
+> 연결 허용 > 다음 > 도메인, 개인, 공용 체크 > 다음 > SQL Server 포트 열기 입력 > 완료
+> net stop MSSQL$SQLEXPRESS > net start MSSQL$SQLEXPRESS
 
+서버확인
+c:\>sqlcmd -L
+서버:
+    ;UID:Login ID=?;PWD:Password=?;Trusted_Connection:Use Integrated Security=?;*APP:AppName=?;*WSID:WorkStation ID=?;
 
+서버접속
+c:\>sqlcmd -S NAYOUNGKIM\SQLEXPRESS -E
+데이터베이스 목록 확인
+1> SELECT name FROM sys.databases;
+2> GO
+name                                                                                                                    
+--------------------------------------------------------------------------------------------------------------------------------
+master                                                                                                                  
+tempdb                                                                                                                  
+model                                                                                                                   
+msdb                                                                                                                    
+(4개 행 적용됨)
 
+sa 계정 활성화
+1>
+2> ALTER LOGIN sa ENABLE;
+3> GO
+1> ALTER LOGIN sa WITH PASSWORD = '1234';
+2> GO
+1> USE master;
+2> GO
+데이터베이스 컨텍스트가 'master'(으)로 변경되었습니다.
+1> ALTER LOGIN sa ENABLE;
+2> GO
+1> ALTER LOGIN sa WITH CHECK_POLICY = OFF;
+2> GO
+1> ALTER LOGIN sa WITH PASSWORD = '1234';
+2> GO
+1> EXIT
 
+[SQL Server Browser 상태 확인]
+c:\>sc queryex SQLBrowser
+SERVICE_NAME: SQLBrowser
+        종류               : 10  WIN32_OWN_PROCESS
+        상태              : 1  STOPPED
+        WIN32_EXIT_CODE    : 1077  (0x435)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        검사점         : 0x0
+        WAIT_HINT          : 0x0
+        PID                : 0
+        플래그              :
 
+c:\>net start SQLBrowser
+시스템 오류 1058이(가) 생겼습니다.
+서비스를 사용할 수 없거나 서비스와 연관되어 사용 가능한 장치가 없기 때문에 서비스를 시작할 수 없습니다.
+=> SQL Server Browser가 "사용 안 함(Disabled)" 상태로 설정되어 있어서 발생
+=> 서비스를 자동(Manual)으로 변경 후 다시 시작
 
+c:\>sc config SQLBrowser start= auto
+[SC] ChangeServiceConfig 성공
 
+c:\>net start SQLBrowser
+SQL Server Browser 서비스를 시작합니다..
+SQL Server Browser 서비스가 잘 시작되었습니다.
 
+[sa 계정 활성화 및 설정]
+c:\>sqlcmd -S NAYOUNGKIM\SQLEXPRESS -E
+1> USE master;
+2> GO
+데이터베이스 컨텍스트가 'master'(으)로 변경되었습니다.
+1> ALTER LOGIN sa ENABLE;
+2> GO
+1> ALTER LOGIN sa WITH PASSWORD = '1234';
+2> GO
+1> ALTER LOGIN sa WITH CHECK_POLICY = OFF;
+2> GO
+1> SELECT name, is_disabled FROM sys.sql_logins WHERE name = 'sa';
+2> GO
+name                                                                                                                             is_disabled
+-------------------------------------------------------------------------------------------------------------------------------- -----------
+sa                                                                                                                                         0
+-- 인증모드변경 
+1> EXEC sp_configure 'show advanced options', 1;
+2> GO
+구성 옵션 'show advanced options'이(가) 0에서 1(으)로 변경되었습니다. RECONFIGURE 문을 실행하여 설치하십시오.
+1> RECONFIGURE;
+2> GO
+1> EXEC xp_instance_regwrite
+2>     N'HKEY_LOCAL_MACHINE',
+3>     N'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer',
+4>     N'LoginMode',
+5>     REG_DWORD,
+6>     2;
+7> GO
+1> SELECT serverproperty('IsIntegratedSecurityOnly') AS AuthenticationMode;
+2> GO
+AuthenticationMode  
+-----------------
+1
+(1개 행 적용됨)
+(0개 행 적용됨)
+c:\>net stop MSSQL$SQLEXPRESS
+SQL Server (SQLEXPRESS) 서비스를 멈춥니다..
+SQL Server (SQLEXPRESS) 서비스를 잘 멈추었습니다.
+c:\>net start MSSQL$SQLEXPRESS
+SQL Server (SQLEXPRESS) 서비스를 시작합니다..
+SQL Server (SQLEXPRESS) 서비스가 잘 시작되었습니다.
 
+c:\>sqlcmd -S NAYOUNGKIM\SQLEXPRESS -E
+1> SELECT serverproperty('IsIntegratedSecurityOnly') AS AuthenticationMode;
+2> GO
+AuthenticationMode  
+-----------------
+1
+수정안됨
 
+[로그인 모드 레지스트리 수정]
+Win + R > regedit > 컴퓨터\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQLServer
+> 새로만들기 > DWORD 32비트 > LoginMode, 2 
+c:\>net stop MSSQL$SQLEXPRESS
+SQL Server (SQLEXPRESS) 서비스를 멈춥니다..
+SQL Server (SQLEXPRESS) 서비스를 잘 멈추었습니다.
+c:\>net start MSSQL$SQLEXPRESS
+SQL Server (SQLEXPRESS) 서비스를 시작합니다..
+SQL Server (SQLEXPRESS) 서비스가 잘 시작되었습니다.
 
-
-
-
-
-
-
-
-
+[sa 로그인]
+c:\>sqlcmd -S NAYOUNGKIM\SQLEXPRESS -U sa -P "1234"
+1>
+성공!!
 
