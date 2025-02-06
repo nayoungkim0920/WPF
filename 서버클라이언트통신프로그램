@@ -1,12 +1,30 @@
 1. 데이터베이스설계
 c:\>sqlcmd -S NAYOUNGKIM\SQLEXPRESS -U sa -P "****"
-1> CREATE TABLE ClientInfo (
+
+1>CREATE TABLE ServerInfo (
 2>     ID VARCHAR(10) PRIMARY KEY,
 3>     IPAddress VARCHAR(15),
 4>     Port INT
 5> );
 6> GO
 1> INSERT INTO ServerInfo (ID, IPAddress, Port)
+2> VALUES
+3>     ('S00001', '127.0.0.1', 5000);
+5> GO
+1> SELECT * FROM ServerInfo;
+2> GO
+ID         IPAddress       Port
+---------- --------------- -----------
+S00001     127.0.0.1              5000
+(1개 행 적용됨)
+
+1> CREATE TABLE ClientInfo (
+2>     ID VARCHAR(10) PRIMARY KEY,
+3>     IPAddress VARCHAR(15),
+4>     Port INT
+5> );
+6> GO
+1> INSERT INTO ClientInfo (ID, IPAddress, Port)
 2> VALUES
 3>     ('C00001', '127.0.0.1', 3000),
 4>     ('C00002', '127.0.0.1', 4000);
