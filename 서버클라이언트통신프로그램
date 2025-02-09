@@ -1,4 +1,10 @@
-1. 데이터베이스설계
+1. 프로그램설계
+원격지의 클라이언트들을 관리하는 서버 프로그램과 클라이언트프로그램 개발
+주요기능 : 접속, 텍스트 통신, 원격실행
+개발언어 : WPF
+개발툴 : Visual Studio 2022, MSSQL 2022 EXPRESS
+
+1) 데이터베이스설계
 c:\>sqlcmd -S NAYOUNGKIM\SQLEXPRESS -U sa -P "****"
 
 1>CREATE TABLE ServerInfo (
@@ -42,27 +48,43 @@ WpfServerApp, WpfClientApp 각각 설치
 VisualStudio 2022 > 도구 > NuGet 패키지 관리 > 패키지 관리자 콘솔 > 
 Install-Package Microsoft.Data.SqlClient
 
-c:\>ping 127.0.0.1
-
-Ping 127.0.0.1 32바이트 데이터 사용:
-127.0.0.1의 응답: 바이트=32 시간<1ms TTL=128
-127.0.0.1의 응답: 바이트=32 시간<1ms TTL=128
-
-127.0.0.1에 대한 Ping 통계:
-    패킷: 보냄 = 2, 받음 = 2, 손실 = 0 (0% 손실),
-왕복 시간(밀리초):
-    최소 = 0ms, 최대 = 0ms, 평균 = 0ms
-Control-C
-^C
-
-c:\>ping 192.168.0.3
-Ping 192.168.0.3 32바이트 데이터 사용:
-192.168.0.3의 응답: 바이트=32 시간<1ms TTL=128
-192.168.0.3의 응답: 바이트=32 시간<1ms TTL=128
-
-192.168.0.3에 대한 Ping 통계:
-    패킷: 보냄 = 2, 받음 = 2, 손실 = 0 (0% 손실),
-왕복 시간(밀리초):
-    최소 = 0ms, 최대 = 0ms, 평균 = 0ms
-Control-C
-^C
+2) 프로그램설계
+Solution1
+|-WpfAppServer
+|    |-Behaviors
+|    |    |_AutoScrollBehavior.cs
+|    |-Converters
+|    |    |-BooleanToColorConverter.cs
+|    |    |-BooleanToVisibilityConverter.cs
+|    |    |-InvertedBooleanToVisibilityConverter.cs
+|    |    |_LoglevelConverter.cs
+|    |-Helpers
+|    |    |_RelayCommand.cs
+|    |-Models
+|    |    |_ClientInfo.cs
+|    |-Services
+|    |    |-DatabaseServices.cs
+|    |    |_NetworkServices.cs
+|    |-ViewModels
+|    |    |_ServerViewModel.cs
+|    |-Views
+|    |    |_MainWindow.xaml
+|    |        |_MainWindow.xaml.cs
+|    |-App.xaml
+|    |_AssemblyInfo.cs
+|_WpfAppClient
+     |-Behaviors
+     |    |_AutoScrollBehavior.cs
+     |-Converters
+     |    |-AliveStatusColorConverter.cs
+     |    |_LoglevelConverter.cs
+     |-Services
+     |    |-DatabaseServices.cs
+     |    |_NetworkServices.cs
+     |-ViewModels
+     |    |_ClientViewModel.cs
+     |-Views
+     |    |_MainWindow.xaml
+     |        |_MainWindow.xaml.cs
+     |-App.xaml
+     |_AssemblyInfo.cs
