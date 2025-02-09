@@ -5,7 +5,7 @@
 
 ![Image](https://github.com/user-attachments/assets/1fd76d08-e129-41c6-b08d-a89038645427)
 
-# WPF & Python & Yolov 5
+# WPF & Python & Yolov 5 컵인식 프로그램
 간단한 이미지 처리 및 컵인식 프로그램
 
 ![Image](https://github.com/user-attachments/assets/cbda6002-e48c-4199-bd0c-b5a337ff9bf9)
