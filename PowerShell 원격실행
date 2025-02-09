@@ -1,0 +1,82 @@
+1. 원격지의 PowerShell Remoting을 활성화
+
+1) PowerShell Remoting 활성화
+PowerShell을 관리자로 실행
+PS C:\> Enable-PSRemoting -Force
+요청을 수신하도록 WinRM이 업데이트되었습니다.
+WinRM 서비스 종류가 변경되었습니다.
+WinRM 서비스를 시작했습니다.
+
+2) 방화벽 규칙 설정
+PowerShell Remoting은 기본적으로 TCP 포트 5985 (HTTP) 및 TCP 포트 5986 (HTTPS)를 사용
+해당 포트가 열려 있는지 확인
+PowerShell Remoting을 활성화하면 자동으로 방화벽에 규칙이 추가
+- 수동으로 방화벽을 설정
+# HTTP(기본 포트 5985) 방화벽 규칙 추가
+New-NetFirewallRule -Name "Allow-PowerShell-Remoting" -Protocol TCP -LocalPort 5985 -Action Allow
+
+3) 원격 연결 확인
+Test-WSMan -ComputerName <원격 IP 또는 호스트 이름>
+
+4) 원격 명령 실행
+-원격 세션에 접속하기
+Enter-PSSession -ComputerName <원격 IP> -Credential <사용자 이름>
+-원격 시스템에서 명령 실행하기
+Invoke-Command -ComputerName <원격 IP> -ScriptBlock { Get-Process } -Credential <사용자 이름>
+
+5) 디버깅
+-PowerShell 실행 정책을 확인
+PS C:\>Get-ExecutionPolicy
+RemoteSigned
+
+-정책변경
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+-인증정보제공
+$credential = Get-Credential
+Invoke-Command -ComputerName 127.0.0.1 -Credential $credential -ScriptBlock {
+    Start-Process 'C:\abc.exe'
+}
+
+-원격 실행 명령
+Invoke-Command -ComputerName 127.0.0.1 -Credential $credential -ScriptBlock {
+    Start-Process 'C:\abc.exe'
+}
+
+-원격 시스템에서 PowerShell Remoting이 정상적으로 작동하는지 확인
+Test-WSMan -ComputerName 192.168.0.3
+PS C:\> Test-WSMan -ComputerName 192.168.0.3
+wsmid           : http://schemas.dmtf.org/wbem/wsman/identity/1/wsmanidentity.xsd
+ProtocolVersion : http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd
+ProductVendor   : Microsoft Corporation
+ProductVersion  : OS: 0.0.0 SP: 0.0 Stack: 3.0
+
+-원격지의 PowerShell 사용자 계정 확인
+PS C:\> Get-LocalUser
+
+Name               Enabled Description
+----               ------- -----------
+Administrator      False   컴퓨터 도메인을 관리하도록 기본 제공된 계정
+DefaultAccount     False   시스템에서 관리하는 사용자 계정입니다.
+Guest              False   게스트가 컴퓨터 도메인을 액세스하도록 기본 제공된 계정
+
+-권한부여하기
+PS C:\> Enable-LocalUser -Name "Administrator"Set-LocalUser -Name "Administrator" -Password (ConvertTo-SecureString "********" -AsPlainText -Force)
+
+-권한부여확인
+PS C:\> Get-LocalUser
+
+Name               Enabled Description
+----               ------- -----------
+Administrator      True    컴퓨터 도메인을 관리하도록 기본 제공된 계정
+DefaultAccount     False   시스템에서 관리하는 사용자 계정입니다.
+Guest              False   게스트가 컴퓨터 도메인을 액세스하도록 기본 제공된 계정
+
+-비밀번호설정하기
+Set-LocalUser -Name "Administrator" -Password (ConvertTo-SecureString "********" -AsPlainText -Force)
+
+-계정/비밀번호를 넣은 완성된 원격실행 명령어
+$credential = New-Object System.Management.Automation.PSCredential("Administrator", (ConvertTo-SecureString "********" -AsPlainText -Force))
+Invoke-Command -ComputerName "127.0.0.1" -Credential $credential -ScriptBlock {
+    Start-Process 'C:\abc.exe'
+}
