@@ -1,4 +1,4 @@
-# 원격지클라이언트 관리 프로그램
+# WPF 원격지 클라이언트 관리 프로그램
 간단한 원격지 클라이언트 관리 프로그램
 
 ![Image](https://github.com/user-attachments/assets/08be3b6b-61bc-4957-bf7d-5e3a315023db)
