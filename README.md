@@ -1,6 +1,9 @@
 # 원격지클라이언트 관리 프로그램
 간단한 원격지 클라이언트 관리 프로그램
 
+![Image](https://github.com/user-attachments/assets/08be3b6b-61bc-4957-bf7d-5e3a315023db)
+
+![Image](https://github.com/user-attachments/assets/1fd76d08-e129-41c6-b08d-a89038645427)
 
 # WPF & Python & Yolov 5
 간단한 이미지 처리 및 컵인식 프로그램
