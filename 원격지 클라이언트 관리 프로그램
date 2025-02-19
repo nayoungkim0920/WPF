@@ -1,7 +1,12 @@
 1. 프로그램설계
 원격지의 클라이언트들을 관리하는 서버 프로그램과 클라이언트프로그램 개발
-주요기능 : 대기/접속/해제, 텍스트 통신, 원격실행
-개발언어 : WPF
+주요기능 : 대기/접속/해제, 텍스트 통신, 원격실행, 주요기능 DLL(디자인스타일, 로그스타일)
+개발언어 및 패턴 : WPF, C#, MVVM(Model-View-ViewModel) 디자인 패턴 적용
+Model → 비즈니스 로직 및 데이터 처리 (예: 데이터베이스 접근)
+ViewModel → Model의 데이터를 가공하여 View에 전달
+View → ViewModel과 데이터 바인딩을 사용하여 UI 업데이트
+View는 ViewModel을 참조하지만, ViewModel은 View를 참조하지 않음.
+이로 인해 UI가 변경되더라도 Model과 ViewModel에는 영향을 주지 않아 유지보수가 쉬워짐
 개발툴 : Visual Studio 2022, MSSQL 2022 EXPRESS
 
 1) 데이터베이스설계
@@ -50,14 +55,18 @@ Install-Package Microsoft.Data.SqlClient
 
 2) 프로그램설계
 Solution1
-|-WpfAppServer
+|-Solution1.Shared.Wpf (DLL) PowerShell : dotnet build Solution1.Shared.Wpf
 |    |-Behaviors
 |    |    |_AutoScrollBehavior.cs
 |    |-Converters
+|    |    |_LogLevelConverter.cs
+|    |_Styles
+|         |_GlobalStyles.xaml (빌드작업:리소스)
+|-WpfAppServer (추가 > 프로젝트참조 : Solution1.Shared.Wpf)
+|    |-Converters
 |    |    |-BooleanToColorConverter.cs
 |    |    |-BooleanToVisibilityConverter.cs
-|    |    |-InvertedBooleanToVisibilityConverter.cs
-|    |    |_LoglevelConverter.cs
+|    |    |_InvertedBooleanToVisibilityConverter.cs
 |    |-Helpers
 |    |    |_RelayCommand.cs
 |    |-Models
@@ -72,12 +81,9 @@ Solution1
 |    |        |_MainWindow.xaml.cs
 |    |-App.xaml
 |    |_AssemblyInfo.cs
-|_WpfAppClient
-     |-Behaviors
-     |    |_AutoScrollBehavior.cs
+|_WpfAppClient (추가 > 프로젝트참조 : Solution1.Shared.Wpf)
      |-Converters
-     |    |-AliveStatusColorConverter.cs
-     |    |_LoglevelConverter.cs
+     |    |_AliveStatusColorConverter.cs
      |-Services
      |    |-DatabaseServices.cs
      |    |_NetworkServices.cs
