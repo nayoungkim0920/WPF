@@ -130,5 +130,20 @@ Fluent.Ribbon/Build/global.json 수정
         "rollForward": "feature"
     }
 }
-빌드
 
+빌드
+"C:\wpfProject\Fluent.Ribbon-develop\Fluent.Ribbon\obj\Debug\net8.0-windows\Fluent.dll"
+
+Fluent.dll을 Solution1.Shared.Wpf에 복사
+C:\wpfProject\Fluent.Ribbon-develop\Fluent.Ribbon\obj\Debug\net8.0-windows\Fluent.dll
+C:\wpfProject\Solution1.Shared.Wpf\libs\Fluent.dll
+
+Solution1.Shared.Wpf > 우측 마우스 버튼 > 추가 > 프로젝트 참조 > 찾아보기 > 찾아보기 > 
+C:\wpfProject\Solution1.Shared.Wpf\libs\Fluent.dll > 추가
+
+Solution1.Shared.Wpf.cproj 파일에 자동으로 등록 됨
+  <ItemGroup>
+    <Reference Include="Fluent">
+      <HintPath>libs\Fluent.dll</HintPath>
+    </Reference>
+  </ItemGroup>
