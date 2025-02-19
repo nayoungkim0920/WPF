@@ -114,36 +114,19 @@ Id                                  Versions                                 Pro
 --                                  --------                                 -----------                                                              
 Fluent.Ribbon                       {10.1.0}                                 Solution1.Shared.Wpf   
 
-테마 xaml파일 다운로드
-https://github.com/FluentRibbon/Fluent.Ribbon 
-Fluent.Ribbon-develop.zip 다운로드
-C:\Users\nayou\Downloads\Fluent.Ribbon-develop\Fluent.Ribbon-develop\Fluent.Ribbon\Themes\Controls\Ribbon.xaml
+DLL 네임스페이스와 클래스 찾기
+https://github.com/icsharpcode/ILSpy/releases
+ILSpy_Installer_9.0.0.7889-x64.msi 다운로드
+C:\Users\nayou\AppData\Local\Programs\ILSpy 설치
 
-C:\wpfProject\Fluent.Ribbon-develop 생성 이동
-PS C:\wpfProject\Fluent.Ribbon-develop> dotnet --list-sdks
-8.0.303 [C:\Program Files\dotnet\sdk]
-9.0.102 [C:\Program Files\dotnet\sdk]
-Fluent.Ribbon/Build/global.json 수정
-{
-    "sdk": {
-        "version": "9.0.102",
-        "rollForward": "feature"
-    }
-}
+"C:\wpfProject\Solution1\WpfAppServer\bin\Debug\net8.0-windows\Fluent.dll"
 
-빌드
-"C:\wpfProject\Fluent.Ribbon-develop\Fluent.Ribbon\obj\Debug\net8.0-windows\Fluent.dll"
 
-Fluent.dll을 Solution1.Shared.Wpf에 복사
-C:\wpfProject\Fluent.Ribbon-develop\Fluent.Ribbon\obj\Debug\net8.0-windows\Fluent.dll
-C:\wpfProject\Solution1.Shared.Wpf\libs\Fluent.dll
 
-Solution1.Shared.Wpf > 우측 마우스 버튼 > 추가 > 프로젝트 참조 > 찾아보기 > 찾아보기 > 
-C:\wpfProject\Solution1.Shared.Wpf\libs\Fluent.dll > 추가
 
-Solution1.Shared.Wpf.cproj 파일에 자동으로 등록 됨
-  <ItemGroup>
-    <Reference Include="Fluent">
-      <HintPath>libs\Fluent.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+
+
+
+
+
+
