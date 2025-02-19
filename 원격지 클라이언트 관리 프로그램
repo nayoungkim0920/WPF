@@ -94,3 +94,41 @@ Solution1
      |        |_MainWindow.xaml.cs
      |-App.xaml
      |_AssemblyInfo.cs
+
+3) 업그레이드
+3-1) Fluent 테마 
+Fluent 테마 설치
+도구 > NuGet 패키지 관리자 > 패키지 관리자 콘솔
+PM> Install-Package Fluent.Ribbon -Version 10.1.0
+PM> Get-Package Fluent.Ribbon
+Id                                  Versions                                 ProjectName                                                              
+--                                  --------                                 -----------                                                              
+Fluent.Ribbon                       {10.1.0}                                 Solution1.Shared.Wpf                                                     
+Fluent.Ribbon                       {10.1.0}                                 WpfAppServer    
+
+Fluent 테마 제거
+기본프로젝트 : WpfAppServer
+PM> Uninstall-Package Fluent.Ribbon
+PM> Get-Package Fluent.Ribbon
+Id                                  Versions                                 ProjectName                                                              
+--                                  --------                                 -----------                                                              
+Fluent.Ribbon                       {10.1.0}                                 Solution1.Shared.Wpf   
+
+테마 xaml파일 다운로드
+https://github.com/FluentRibbon/Fluent.Ribbon 
+Fluent.Ribbon-develop.zip 다운로드
+C:\Users\nayou\Downloads\Fluent.Ribbon-develop\Fluent.Ribbon-develop\Fluent.Ribbon\Themes\Controls\Ribbon.xaml
+
+C:\wpfProject\Fluent.Ribbon-develop 생성 이동
+PS C:\wpfProject\Fluent.Ribbon-develop> dotnet --list-sdks
+8.0.303 [C:\Program Files\dotnet\sdk]
+9.0.102 [C:\Program Files\dotnet\sdk]
+Fluent.Ribbon/Build/global.json 수정
+{
+    "sdk": {
+        "version": "9.0.102",
+        "rollForward": "feature"
+    }
+}
+빌드
+
