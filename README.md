@@ -1,6 +1,6 @@
 # WPF 원격지 클라이언트 관리 프로그램 : 업그레이드 
 Date. 2025-02-21
-1) Theme 선택 : Light/Dark
+Theme : Light/Dark
 ![Image](https://github.com/user-attachments/assets/d50b5baa-06a8-4d46-8b7a-4f566aba7edc)
 
 ![Image](https://github.com/user-attachments/assets/4f3c35f2-1a2d-41be-8cae-22578a319141)
