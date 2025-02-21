@@ -1,4 +1,5 @@
-# WPF 원격지 클라이언트 관리 프로그램 : 업그레이드 # 2025-02-21
+# WPF 원격지 클라이언트 관리 프로그램 : 업그레이드 
+Date. 2025-02-21
 1) Theme 선택 : Light/Dark
 ![Image](https://github.com/user-attachments/assets/d50b5baa-06a8-4d46-8b7a-4f566aba7edc)
 
@@ -9,6 +10,7 @@
 ![Image](https://github.com/user-attachments/assets/f4b78529-80e9-4e82-9055-a388768e0f2c)
 
 # WPF 원격지 클라이언트 관리 프로그램
+Date. 2025-02-10
 간단한 원격지 클라이언트 관리 프로그램
 
 ![Image](https://github.com/user-attachments/assets/08be3b6b-61bc-4957-bf7d-5e3a315023db)
@@ -17,7 +19,7 @@
 
 # WPF & Python & Yolov 5 컵인식 프로그램
 간단한 이미지 처리 및 컵인식 프로그램
-
+Date. 2025-02-02
 ![Image](https://github.com/user-attachments/assets/cbda6002-e48c-4199-bd0c-b5a337ff9bf9)
 
 ![Image](https://github.com/user-attachments/assets/12a3c6d0-4b0f-4b87-a6c1-7e3996e1acdf)
