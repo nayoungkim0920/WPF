@@ -7,7 +7,7 @@ Live Chart : 클라이언트 연결상태 실시간 그래프
 
 ![Image](https://github.com/user-attachments/assets/3981930c-5a36-4f70-bf99-76c187990677)
 
-MaterialDesign : Radio 버튼으로 Theme 선택 
+Material Design : Radio 버튼으로 Theme 선택 
 
 ![Image](https://github.com/user-attachments/assets/40d3bd99-24f7-4232-a659-bda54cf1346c)
 
