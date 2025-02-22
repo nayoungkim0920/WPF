@@ -1,4 +1,18 @@
 # WPF 원격지 클라이언트 관리 프로그램 : 업그레이드 
+Date. 2025-02-22
+
+Live Chart : 클라이언트 연결상태 실시간 그래프
+
+![Image](https://github.com/user-attachments/assets/dd3cdeaa-2b25-4aa3-a22c-c96b0ca06778)
+
+![Image](https://github.com/user-attachments/assets/3981930c-5a36-4f70-bf99-76c187990677)
+
+MaterialDesign : Radio 버튼으로 Theme 선택 
+
+![Image](https://github.com/user-attachments/assets/40d3bd99-24f7-4232-a659-bda54cf1346c)
+
+![Image](https://github.com/user-attachments/assets/6f08be74-d283-452d-a3f2-37a0c9f6fc15)
+
 Date. 2025-02-21
 
 Theme : Light/Dark
