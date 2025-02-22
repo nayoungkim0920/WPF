@@ -96,7 +96,7 @@ Solution1
      |_AssemblyInfo.cs
 
 3) 업그레이드
-3-1) Fluent 테마 
+3-1-1) Fluent 테마 
 Fluent 테마 설치
 도구 > NuGet 패키지 관리자 > 패키지 관리자 콘솔
 PM> Install-Package Fluent.Ribbon -Version 10.1.0
@@ -121,12 +121,27 @@ C:\Users\nayou\AppData\Local\Programs\ILSpy 설치
 
 "C:\wpfProject\Solution1\WpfAppServer\bin\Debug\net8.0-windows\Fluent.dll"
 
+실패
 
+3-1-2) ThemeManager 클래스로 테마 기능 추가, 테마를 서버는 콤보박스, 클라이언트는 라디오박스로 선택
+Solution1
+|_Solution1.Shared.Wpf (DLL) PowerShell : dotnet build Solution1.Shared.Wpf
+     |-Styles
+     |    |-Dark.xaml
+     |    |_Light.xaml
+     |_Themes
+          |_ThemeManager.cs
 
+3-2) Meterial Design 적용
+패키지관리자콘솔로 각각 설치 및 설정
+기본프로젝트 : Solution1.Shared.Wpf, WpfAppServer, WpfAppClient
+Install-Package MaterialDesignColors
+Install-Package MaterialDesignThemes
 
-
-
-
+3-3) LiveChart 적용 : 연결상태 실시간 그래프 기능 추가
+패키지관리자콘솔
+기본프로젝트 : WpfAppServer
+Install-Package LiveCharts.Wpf
 
 
 
