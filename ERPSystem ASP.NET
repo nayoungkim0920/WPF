@@ -1,33 +1,149 @@
-1. Visual Studio 2022 필수 설치
+1. 프로젝트 설계
+1) 목적 : 간단한 사용자 관리, 재고 관리, 주문 관리를 한다.
+2) 개발도구 : Visual studio 2022, MSSQL EXPRESS 2022
+3) 시스템설계
+/ERPSystem (솔루션)
+ ├── ERPSystem.API           → ASP.NET Core Web API (백엔드)
+ ├── ERPSystem.Application   → 비즈니스 로직, CQRS 패턴 적용
+ ├── ERPSystem.Domain        → 도메인 모델, 엔티티, 인터페이스
+ ├── ERPSystem.Infrastructure → 데이터베이스, 외부 연동 (EF Core)
+
+4) DB설계
+- Users	사용자 정보 관리 (권한 포함)
+- Products	제품 정보 (이름, 가격, 재고)
+- Orders	주문 정보 (고객, 상태, 날짜)
+- OrderDetails	주문 상세 정보 (주문 ID, 제품, 수량, 금액)
+- Inventory	재고 트랜잭션 (입고, 출고 기록)
+
+ERD (데이터베이스 관계)
+Users (UserId) 1 ─── * Orders (UserId)
+Orders (OrderId) 1 ─── * OrderDetails (OrderId)
+Products (ProductId) 1 ─── * OrderDetails (ProductId)
+Products (ProductId) 1 ─── * Inventory (ProductId)
+
+CREATE DATABASE ERPSystem;
+GO
+
+USE ERPSystem;
+GO
+
+CREATE TABLE Users (
+    UserId INT IDENTITY(1,1) PRIMARY KEY,
+    UserName NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(255) UNIQUE NOT NULL,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    Role NVARCHAR(50) CHECK (Role IN ('Admin', 'Manager', 'Staff')) NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+INSERT INTO Users (UserName, Email, PasswordHash, Role) VALUES 
+('김철수', 'admin@erp.com', 'hashedpassword123', 'Admin'),
+('이영희', 'manager@erp.com', 'hashedpassword456', 'Manager'),
+('박민수', 'staff1@erp.com', 'hashedpassword789', 'Staff'),
+('최지훈', 'staff2@erp.com', 'hashedpassword101', 'Staff'),
+('한수연', 'staff3@erp.com', 'hashedpassword102', 'Staff');
+
+CREATE TABLE Products (
+    ProductId INT IDENTITY(1,1) PRIMARY KEY,
+    ProductName NVARCHAR(200) NOT NULL,
+    Price DECIMAL(10,2) CHECK (Price > 0) NOT NULL,
+    StockQuantity INT CHECK (StockQuantity >= 0) NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+INSERT INTO Products (ProductName, Price, StockQuantity) VALUES 
+('노트북', 1500000, 10),
+('무선 마우스', 25000, 50),
+('기계식 키보드', 55000, 30),
+('27인치 모니터', 300000, 15),
+('레이저 프린터', 200000, 20);
+
+CREATE TABLE Orders (
+    OrderId INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    OrderStatus NVARCHAR(50) CHECK (OrderStatus IN ('Pending', 'Shipped', 'Completed', 'Cancelled')) NOT NULL,
+    OrderDate DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE
+);
+
+INSERT INTO Orders (UserId, OrderStatus) VALUES 
+(1, 'Pending'),
+(2, 'Shipped'),
+(3, 'Completed'),
+(4, 'Pending'),
+(5, 'Cancelled');
+
+CREATE TABLE OrderDetails (
+    OrderDetailId INT IDENTITY(1,1) PRIMARY KEY,
+    OrderId INT NOT NULL,
+    ProductId INT NOT NULL,
+    Quantity INT CHECK (Quantity > 0) NOT NULL,
+    TotalPrice AS (Quantity * (SELECT Price FROM Products WHERE ProductId = OrderDetails.ProductId)) PERSISTED,
+    FOREIGN KEY (OrderId) REFERENCES Orders(OrderId) ON DELETE CASCADE,
+    FOREIGN KEY (ProductId) REFERENCES Products(ProductId)
+);
+
+INSERT INTO OrderDetails (OrderId, ProductId, Quantity) VALUES 
+(1, 1, 1),  -- 노트북 1개
+(1, 2, 2),  -- 무선 마우스 2개
+(2, 3, 1),  -- 기계식 키보드 1개
+(3, 4, 2),  -- 27인치 모니터 2개
+(4, 5, 1);  -- 레이저 프린터 1개
+
+CREATE TABLE Inventory (
+    InventoryId INT IDENTITY(1,1) PRIMARY KEY,
+    ProductId INT NOT NULL,
+    ChangeType NVARCHAR(50) CHECK (ChangeType IN ('IN', 'OUT')) NOT NULL,
+    QuantityChange INT NOT NULL,
+    ChangeDate DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (ProductId) REFERENCES Products(ProductId)
+);
+
+INSERT INTO Inventory (ProductId, ChangeType, QuantityChange) VALUES 
+(1, 'IN', 10),  -- 노트북 10개 입고
+(2, 'IN', 50),  -- 무선 마우스 50개 입고
+(3, 'OUT', 5),  -- 기계식 키보드 5개 출고
+(4, 'OUT', 2),  -- 27인치 모니터 2개 출고
+(5, 'IN', 10);  -- 레이저 프린터 10개 입고
+
+CREATE INDEX IDX_Users_Email ON Users(Email);
+CREATE INDEX IDX_Orders_UserId ON Orders(UserId);
+CREATE INDEX IDX_OrderDetails_ProductId ON OrderDetails(ProductId);
+CREATE INDEX IDX_Inventory_ProductId ON Inventory(ProductId);
+
+
+
+2. 프로젝트 구현
+1) Visual Studio 2022 필수 설치
 ASP.NET 및 웹 개발
 .NET 데스크톱 개발
 Azure 개발 (클라우드 배포 시 필요)
 
-2. 솔루션만들기
+2) 솔루션만들기
 빈솔루션 > ERPSystem
 
-3. 프로젝트만들기
-1) 백엔드 프로젝트 생성
+3) 프로젝트만들기
+3-1) 백엔드 프로젝트 생성
 "ASP.NET Core Web API" > ERPSystem.API
 
-2) 비지니스 로직, CQRS 패턴 적용
+3-2) 비지니스 로직, CQRS 패턴 적용
 빈 프로젝트 > ERPSystem.Application
 
-3) 도메인 모델, 엔티티, 인터페이스
+3-3) 도메인 모델, 엔티티, 인터페이스
 빈 프로젝트 > ERPSystem.Domain
 
-4) 데이터베이스, 외부 서비스 연동
+3-4) 데이터베이스, 외부 서비스 연동
 빈 프로젝트 > ERPSystem.Infrastructure
 
-4. 프로젝트 간 참조(의존성 설정)
+4) 프로젝트 간 참조(의존성 설정)
 프로젝트 우클릭 > 추가 > 참조 > 프로젝트
-1) ERPSystem.API
+4-1) ERPSystem.API
 ERPSystem.Application, ERPSystem.Domain, ERPSystem.Infrastructure 참조 추가
 
-2) ERPSystem.Application
+4-2) ERPSystem.Application
 ERPSystem.Domain 참조 추가
 
-3) ERPSystem.Infrastructure
+4-3) ERPSystem.Infrastructure
 ERPSystem.Domain 참조 추가
 
 
