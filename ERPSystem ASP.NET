@@ -225,6 +225,8 @@ dotnet add package Microsoft.EntityFrameworkCore.Design
 Class Library > ERPSystem.Domain
 
 3-1-2-1) 설계
+CQRS + MediatR, FluentValidation, AutoMapper, Unit of Work, Redis Caching 
+
 ERPSystem.Domain
 ├── Entities
 │   ├── Users.cs          → users 테이블
