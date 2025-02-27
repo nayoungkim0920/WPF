@@ -1,0 +1,8 @@
+1. Visual Studio 2022 필수 설치
+ASP.NET 및 웹 개발
+.NET 데스크톱 개발
+Azure 개발 (클라우드 배포 시 필요)
+
+2. 프로젝트만들기
+백엔드 프로젝트 생성
+"ASP.NET Core Web API" > ERPSystem.API
