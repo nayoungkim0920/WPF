@@ -231,19 +231,58 @@ ERPSystem.Domain
 │   ├── Products.cs       → products 테이블
 │   ├── Orders.cs         → orders 테이블
 │   ├── OrderDetails.cs   → order_details 테이블
-│   └── Inventories.cs    → inventories 테이블
+│   └── Inventory.cs    → inventories 테이블
 ├── Interfaces
 │   ├── IUsersRepository.cs         → IUsersRepository 인터페이스
 │   ├── IProductsRepository.cs      → IProductsRepository 인터페이스
 │   ├── IOrdersRepository.cs        → IOrdersRepository 인터페이스
 │   ├── IOrderDetailsRepository.cs  → IOrderDetailsRepository 인터페이스
-│   └── IInventoriesRepository.cs   → IInventoriesRepository 인터페이스
+│   └── IInventoryRepository.cs   → IInventoriesRepository 인터페이스
 └── Enums
     └── OrderStatus.cs    → 주문 상태(Enum)
 
+3-1-3) 비즈니스 로직, CQRS 패턴 적용
+Class Library > ERPSystem.Application
 
-
-
+3-1-3-1) 설계
+ERPSystem.Application
+├── Common
+│   ├── Behaviors
+│   │   ├── LoggingBehavior.cs
+│   │   ├── ValidationBehavior.cs
+│   │   └── PerformanceBehavior.cs
+│   ├── Exceptions
+│   │   ├── ValidationException.cs
+│   │   ├── NotFoundException.cs
+│   │   └── CustomException.cs
+│   ├── Mappings
+│   │   ├── OrderProfile.cs
+│   │   ├── ProductProfile.cs
+│   │   └── UserProfile.cs
+│   └── Validators
+│       ├── CreateOrderValidator.cs
+│       ├── CreateProductValidator.cs
+│       └── CreateUserValidator.cs
+├── Features
+│   ├── Orders
+│   │   ├── Commands
+│   │   │   ├── CreateOrderCommand.cs
+│   │   │   ├── UpdateOrderCommand.cs
+│   │   │   ├── DeleteOrderCommand.cs
+│   │   ├── Queries
+│   │   │   ├── GetOrderByIdQuery.cs
+│   │   │   ├── GetAllOrdersQuery.cs
+│   ├── Products
+│   │   ├── Commands
+│   │   ├── Queries
+│   ├── Users
+│   │   ├── Commands
+│   │   ├── Queries
+└── Interfaces
+    ├── IUnitOfWork.cs
+    ├── IOrdersRepository.cs
+    ├── IProductsRepository.cs
+    ├── IUsersRepository.cs
 
 
 
