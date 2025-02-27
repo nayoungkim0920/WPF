@@ -117,6 +117,39 @@ ASP.NET 및 웹 개발
 .NET 데스크톱 개발
 Azure 개발 (클라우드 배포 시 필요)
 
+2) IIS, localhost로 인증서버 만들기
+2-1) 프로젝트 생성
+ASP.NET Core Web API > AuthServer 생성
+
+2-2) 패키지 설치
+2-2-1) JWT(Json Web Token) 인증을 위한 라이브러리
+JWT 토큰 검증/Bearer 인증 처리/사용자 권한 관리
+도구 > NuGet 패키지 관리자 > 솔루션용 NuGet 패키지 관리 > 찾아보기 > JwtBearer > 프로젝트 > AuthServer > 
+버전 > 8.0.0 > 설치
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer 
+
+2-3) Program.cs 수정
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 2) 솔루션만들기
 빈솔루션 > ERPSystem
 
@@ -144,7 +177,7 @@ ERPSystem.Domain 참조 추가
 4-3) ERPSystem.Infrastructure
 ERPSystem.Domain 참조 추가
 
-5) 패키지 설치(ERPSystem.API)
+5) 패키지 설치(ERPSystem.API) : 유지보수성, 보안성, 확장성, 효율성을 높이기 위함
 5-1) JWT(Json Web Token) 인증을 위한 라이브러리
 JWT 토큰 검증/Bearer 인증 처리/사용자 권한 관리
 도구 > NuGet 패키지 관리자 > 솔루션용 NuGet 패키지 관리 > 찾아보기 > JwtBearer > 프로젝트 > ERPSystem.API > 
@@ -177,6 +210,58 @@ dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 - dotnet ef migrations 및 dotnet ef database update 명령어 사용 가능
 - 설치하지 않으면 마이그레이션 명령어 실행 시 에러 발생
 dotnet add package Microsoft.EntityFrameworkCore.Design
+
+
+
+
+7) 기본적 인증에 설치한 추가 인증 추가하기
+ERPSystem/ERPSystem.API/Programs.cs
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
