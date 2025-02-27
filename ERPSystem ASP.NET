@@ -111,8 +111,6 @@ CREATE INDEX IDX_Orders_UserId ON Orders(UserId);
 CREATE INDEX IDX_OrderDetails_ProductId ON OrderDetails(ProductId);
 CREATE INDEX IDX_Inventory_ProductId ON Inventory(ProductId);
 
-
-
 2. 프로젝트 구현
 1) Visual Studio 2022 필수 설치
 ASP.NET 및 웹 개발
@@ -146,7 +144,39 @@ ERPSystem.Domain 참조 추가
 4-3) ERPSystem.Infrastructure
 ERPSystem.Domain 참조 추가
 
-
+5) 패키지 설치(ERPSystem.API)
+5-1) JWT(Json Web Token) 인증을 위한 라이브러리
+JWT 토큰 검증/Bearer 인증 처리/사용자 권한 관리
+도구 > NuGet 패키지 관리자 > 솔루션용 NuGet 패키지 관리 > 찾아보기 > JwtBearer > 프로젝트 > ERPSystem.API > 
+버전 > 8.0.0 > 설치
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer 
+5-2) Swagger UI + OpenAPI 문서 자동 생성 라이브러리 7.3.0
+- API 문서를 자동으로 생성하고 UI에서 테스트 가능하게 함
+- ASP.NET Core Web API 프로젝트에서 필수적으로 사용됨
+- Swagger UI를 통해 API 요청을 쉽게 테스트 가능
+dotnet add package Swashbuckle.AspNetCore
+5-3) CQRS 패턴을 위한 라이브러리 12.4.1
+- Handler-Request 패턴을 쉽게 구현 가능
+- 비즈니스 로직을 Controller에서 분리하는 데 도움을 줌
+- Command, Query, Event 기반의 요청 처리
+- 중재자 역할을 하는 Mediator 사용
+- Handler를 분리하여 유지보수성 증가
+dotnet add package MediatR
+5-4) ASP.NET Core에서 유효성 검사를 쉽게 구현하는 라이브러리 11.3.0
+- 기존 DataAnnotations보다 강력한 검증 기능 제공
+- IValidator<T> 인터페이스를 통해 검증 규칙을 쉽게 정의 가능
+dotnet add package FluentValidation.AspNetCore
+5-5) SQL Server 데이터베이스와 연결하는 Entity Framework Core 패키지 9.0.2
+- .UseSqlServer(connectionString)을 사용하여 DB 연결 가능
+- Code-First 방식의 데이터베이스 모델링
+- LINQ를 사용한 데이터베이스 쿼리
+- 마이그레이션(Migration) 지원
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+5-6) EF Core 마이그레이션을 위한 패키지 9.0.2
+- dotnet ef migrations add InitialCreate 등의 명령어를 사용할 때 필요
+- dotnet ef migrations 및 dotnet ef database update 명령어 사용 가능
+- 설치하지 않으면 마이그레이션 명령어 실행 시 에러 발생
+dotnet add package Microsoft.EntityFrameworkCore.Design
 
 
 
