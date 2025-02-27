@@ -35,13 +35,15 @@ CREATE TABLE Users (
     Role NVARCHAR(50) CHECK (Role IN ('Admin', 'Manager', 'Staff')) NOT NULL,
     CreatedAt DATETIME DEFAULT GETDATE()
 );
+GO
 
-INSERT INTO Users (UserName, Email, PasswordHash, Role) VALUES 
+INSERT INTO Users (UserName, Email, PasswordHash, Role) VALUES
 ('김철수', 'admin@erp.com', 'hashedpassword123', 'Admin'),
 ('이영희', 'manager@erp.com', 'hashedpassword456', 'Manager'),
 ('박민수', 'staff1@erp.com', 'hashedpassword789', 'Staff'),
 ('최지훈', 'staff2@erp.com', 'hashedpassword101', 'Staff'),
 ('한수연', 'staff3@erp.com', 'hashedpassword102', 'Staff');
+GO
 
 CREATE TABLE Products (
     ProductId INT IDENTITY(1,1) PRIMARY KEY,
@@ -50,6 +52,7 @@ CREATE TABLE Products (
     StockQuantity INT CHECK (StockQuantity >= 0) NOT NULL,
     CreatedAt DATETIME DEFAULT GETDATE()
 );
+GO
 
 INSERT INTO Products (ProductName, Price, StockQuantity) VALUES 
 ('노트북', 1500000, 10),
@@ -57,6 +60,7 @@ INSERT INTO Products (ProductName, Price, StockQuantity) VALUES
 ('기계식 키보드', 55000, 30),
 ('27인치 모니터', 300000, 15),
 ('레이저 프린터', 200000, 20);
+GO
 
 CREATE TABLE Orders (
     OrderId INT IDENTITY(1,1) PRIMARY KEY,
@@ -65,6 +69,7 @@ CREATE TABLE Orders (
     OrderDate DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE
 );
+GO
 
 INSERT INTO Orders (UserId, OrderStatus) VALUES 
 (1, 'Pending'),
@@ -72,23 +77,43 @@ INSERT INTO Orders (UserId, OrderStatus) VALUES
 (3, 'Completed'),
 (4, 'Pending'),
 (5, 'Cancelled');
+GO
 
+-- OrderDetails 테이블 생성
 CREATE TABLE OrderDetails (
     OrderDetailId INT IDENTITY(1,1) PRIMARY KEY,
     OrderId INT NOT NULL,
     ProductId INT NOT NULL,
     Quantity INT CHECK (Quantity > 0) NOT NULL,
-    TotalPrice AS (Quantity * (SELECT Price FROM Products WHERE ProductId = OrderDetails.ProductId)) PERSISTED,
+    TotalPrice DECIMAL(10, 2) NULL, -- 총 가격을 저장할 컬럼 (NULL 허용)
     FOREIGN KEY (OrderId) REFERENCES Orders(OrderId) ON DELETE CASCADE,
     FOREIGN KEY (ProductId) REFERENCES Products(ProductId)
 );
+GO
 
-INSERT INTO OrderDetails (OrderId, ProductId, Quantity) VALUES 
+-- 트리거 생성: 새로 삽입된 OrderDetails에 대해 총 가격 계산
+CREATE TRIGGER trg_CalculateTotalPrice
+ON OrderDetails
+AFTER INSERT
+AS
+BEGIN
+    UPDATE od
+    SET od.TotalPrice = i.Quantity * p.Price
+    FROM OrderDetails od
+    INNER JOIN inserted i ON od.OrderDetailId = i.OrderDetailId
+    INNER JOIN Products p ON i.ProductId = p.ProductId;
+END;
+GO
+
+-- OrderDetails 데이터 삽입
+INSERT INTO OrderDetails (OrderId, ProductId, Quantity)
+VALUES
 (1, 1, 1),  -- 노트북 1개
 (1, 2, 2),  -- 무선 마우스 2개
 (2, 3, 1),  -- 기계식 키보드 1개
 (3, 4, 2),  -- 27인치 모니터 2개
 (4, 5, 1);  -- 레이저 프린터 1개
+GO
 
 CREATE TABLE Inventory (
     InventoryId INT IDENTITY(1,1) PRIMARY KEY,
@@ -98,6 +123,7 @@ CREATE TABLE Inventory (
     ChangeDate DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (ProductId) REFERENCES Products(ProductId)
 );
+GO
 
 INSERT INTO Inventory (ProductId, ChangeType, QuantityChange) VALUES 
 (1, 'IN', 10),  -- 노트북 10개 입고
@@ -105,11 +131,13 @@ INSERT INTO Inventory (ProductId, ChangeType, QuantityChange) VALUES
 (3, 'OUT', 5),  -- 기계식 키보드 5개 출고
 (4, 'OUT', 2),  -- 27인치 모니터 2개 출고
 (5, 'IN', 10);  -- 레이저 프린터 10개 입고
+GO
 
 CREATE INDEX IDX_Users_Email ON Users(Email);
 CREATE INDEX IDX_Orders_UserId ON Orders(UserId);
 CREATE INDEX IDX_OrderDetails_ProductId ON OrderDetails(ProductId);
 CREATE INDEX IDX_Inventory_ProductId ON Inventory(ProductId);
+GO
 
 2. 프로젝트 구현
 1) Visual Studio 2022 필수 설치
@@ -128,121 +156,90 @@ JWT 토큰 검증/Bearer 인증 처리/사용자 권한 관리
 버전 > 8.0.0 > 설치
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer 
 
-2-3) Program.cs 수정
+2-3) https://localhost:7190/swagger/index.html
+POST : /api/Auth/login > Try it out > username, password 입력 > Execute
+Code	Details 200	
+Response body
+Download
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdHVzZXIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImV4cCI6MTc0MDcyODg0NCwiaXNzIjoibG9jYWxob3N0IiwiYXVkIjoibG9jYWxob3N0In0.e0hmiWmDj32xpHRHvDsLE_PE5kiCIsUHTq-6VqaK8n4"
+}
+Response headers
+ content-type: application/json; charset=utf-8 
+ date: Thu,27 Feb 2025 07:47:24 GMT 
+ server: Kestrel 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2) 솔루션만들기
+3) 솔루션만들기
 빈솔루션 > ERPSystem
 
-3) 프로젝트만들기
-3-1) 백엔드 프로젝트 생성
+3-1) 프로젝트만들기
+3-1-1) 백엔드 프로젝트 생성
 "ASP.NET Core Web API" > ERPSystem.API
 
-3-2) 비지니스 로직, CQRS 패턴 적용
-빈 프로젝트 > ERPSystem.Application
-
-3-3) 도메인 모델, 엔티티, 인터페이스
-빈 프로젝트 > ERPSystem.Domain
-
-3-4) 데이터베이스, 외부 서비스 연동
-빈 프로젝트 > ERPSystem.Infrastructure
-
-4) 프로젝트 간 참조(의존성 설정)
+3-1-2) 프로젝트 간 참조(의존성 설정)
 프로젝트 우클릭 > 추가 > 참조 > 프로젝트
-4-1) ERPSystem.API
+3-1-2-1) ERPSystem.API
 ERPSystem.Application, ERPSystem.Domain, ERPSystem.Infrastructure 참조 추가
 
-4-2) ERPSystem.Application
+3-1-2-2) ERPSystem.Application
 ERPSystem.Domain 참조 추가
 
-4-3) ERPSystem.Infrastructure
+3-1-2-3) ERPSystem.Infrastructure
 ERPSystem.Domain 참조 추가
 
-5) 패키지 설치(ERPSystem.API) : 유지보수성, 보안성, 확장성, 효율성을 높이기 위함
-5-1) JWT(Json Web Token) 인증을 위한 라이브러리
+3-1-3) 패키지 설치(ERPSystem.API) : 유지보수성, 보안성, 확장성, 효율성을 높이기 위함
+3-1-3-1) JWT(Json Web Token) 인증을 위한 라이브러리
 JWT 토큰 검증/Bearer 인증 처리/사용자 권한 관리
 도구 > NuGet 패키지 관리자 > 솔루션용 NuGet 패키지 관리 > 찾아보기 > JwtBearer > 프로젝트 > ERPSystem.API > 
 버전 > 8.0.0 > 설치
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer 
-5-2) Swagger UI + OpenAPI 문서 자동 생성 라이브러리 7.3.0
+3-1-3-2) Swagger UI + OpenAPI 문서 자동 생성 라이브러리 7.3.0
 - API 문서를 자동으로 생성하고 UI에서 테스트 가능하게 함
 - ASP.NET Core Web API 프로젝트에서 필수적으로 사용됨
 - Swagger UI를 통해 API 요청을 쉽게 테스트 가능
 dotnet add package Swashbuckle.AspNetCore
-5-3) CQRS 패턴을 위한 라이브러리 12.4.1
+3-1-3-3) CQRS 패턴을 위한 라이브러리 12.4.1
 - Handler-Request 패턴을 쉽게 구현 가능
 - 비즈니스 로직을 Controller에서 분리하는 데 도움을 줌
 - Command, Query, Event 기반의 요청 처리
 - 중재자 역할을 하는 Mediator 사용
 - Handler를 분리하여 유지보수성 증가
 dotnet add package MediatR
-5-4) ASP.NET Core에서 유효성 검사를 쉽게 구현하는 라이브러리 11.3.0
+3-1-3-4) ASP.NET Core에서 유효성 검사를 쉽게 구현하는 라이브러리 11.3.0
 - 기존 DataAnnotations보다 강력한 검증 기능 제공
 - IValidator<T> 인터페이스를 통해 검증 규칙을 쉽게 정의 가능
 dotnet add package FluentValidation.AspNetCore
-5-5) SQL Server 데이터베이스와 연결하는 Entity Framework Core 패키지 9.0.2
+3-1-3-5) SQL Server 데이터베이스와 연결하는 Entity Framework Core 패키지 9.0.2
 - .UseSqlServer(connectionString)을 사용하여 DB 연결 가능
 - Code-First 방식의 데이터베이스 모델링
 - LINQ를 사용한 데이터베이스 쿼리
 - 마이그레이션(Migration) 지원
 dotnet add package Microsoft.EntityFrameworkCore.SqlServer
-5-6) EF Core 마이그레이션을 위한 패키지 9.0.2
+3-1-3-6) EF Core 마이그레이션을 위한 패키지 9.0.2
 - dotnet ef migrations add InitialCreate 등의 명령어를 사용할 때 필요
 - dotnet ef migrations 및 dotnet ef database update 명령어 사용 가능
 - 설치하지 않으면 마이그레이션 명령어 실행 시 에러 발생
 dotnet add package Microsoft.EntityFrameworkCore.Design
 
+3-1-2) 도메인 모델, 엔티티, 인터페이스 프로젝트 생성
+Class Library > ERPSystem.Domain
 
-
-
-7) 기본적 인증에 설치한 추가 인증 추가하기
-ERPSystem/ERPSystem.API/Programs.cs
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
-
-
+3-1-2-1) 설계
+ERPSystem.Domain
+├── Entities
+│   ├── Users.cs          → users 테이블
+│   ├── Products.cs       → products 테이블
+│   ├── Orders.cs         → orders 테이블
+│   ├── OrderDetails.cs   → order_details 테이블
+│   └── Inventories.cs    → inventories 테이블
+├── Interfaces
+│   ├── IUsersRepository.cs         → IUsersRepository 인터페이스
+│   ├── IProductsRepository.cs      → IProductsRepository 인터페이스
+│   ├── IOrdersRepository.cs        → IOrdersRepository 인터페이스
+│   ├── IOrderDetailsRepository.cs  → IOrderDetailsRepository 인터페이스
+│   └── IInventoriesRepository.cs   → IInventoriesRepository 인터페이스
+└── Enums
+    └── OrderStatus.cs    → 주문 상태(Enum)
 
 
 
