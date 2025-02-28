@@ -319,7 +319,10 @@ ERPSystem.Application
     ├── IOrdersQueryHandler.cs           // `Order` 쿼리 처리 핸들러 인터페이스
     ├── IProductsQueryHandler.cs         // `Product` 쿼리 처리 핸들러 인터페이스
     ├── IUsersQueryHandler.cs            // `User` 쿼리 처리 핸들러 인터페이스
-    ├── IInventoryService.cs
+    ├── IInventoryService.cs             // `Inventory` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+    ├── IInventoryRepository.cs          // `Inventory` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+    ├── IInventoryCommandHandler.cs      // `Inventory` 명령 처리 핸들러 인터페이스
+    └── IInventoryQueryHandler.cs        // `Inventory` 쿼리 처리 핸들러 인터페이스
 
 3-1-3-2) 패키지 설치
 3-1-3-2-1) 객체 유효성 검사 라이브러리
