@@ -175,32 +175,25 @@ Response headers
 3-1) 프로젝트만들기
 3-1-1) 백엔드 프로젝트 생성
 "ASP.NET Core Web API" > ERPSystem.API
-ERPSystem.API
-├── Controllers
-│   ├── UsersController.cs
-│   ├── ProductsController.cs
-│   ├── OrdersController.cs
-│   ├── OrderDetailsController.cs
-│   └── InventoryController.cs
-├── Middleware
-│   ├── ValidationExceptionMiddleware.cs : HTTP 요청이 파이프라인을 통해 들어오는 동안 발생한 예외를 처리, 예외 처리와 응답 반환을 담당
-├── Models
-│   ├── ErrorResponseModel.cs
-│   ├── ResponseModel.cs
-│   └── ValidationErrorModel.cs
-├── Startup.cs
-└── Program.cs
+ERPSystem.API                     // API 요청을 처리하는 프로젝트
+   ├── Controllers                // API 컨트롤러들
+   │   ├── ProductsController.cs
+   │   ├── OrdersController.cs
+   │   └── InventoryController.cs
+   ├── Middleware                 // 예외 처리 미들웨어
+   │   └── ValidationExceptionMiddleware.cs
+   ├── Configuration              // 설정 관련 클래스들
+   │   └── AppSettings.cs
+   ├── Extensions                 // 서비스 확장 메서드
+   │   └── ServiceExtensions.cs
+   ├── Profiles                 // OrdersDto와 CreateOrderCommand, UpdateOrderCommand 간의 매핑을 자동화하기 위해 AutoMapper 프로파일을 설정
+   │   └── OrdersProfile.cs
+   ├── Startup.cs                 // 앱 초기 설정 및 서비스 등록
+   └── Program.cs                 // 프로그램 진입점
 
 3-1-2) 프로젝트 간 참조(의존성 설정)
 프로젝트 우클릭 > 추가 > 참조 > 프로젝트
-3-1-2-1) ERPSystem.API
-ERPSystem.Application, ERPSystem.Domain, ERPSystem.Infrastructure 참조 추가
-
-3-1-2-2) ERPSystem.Application
-ERPSystem.Domain 참조 추가
-
-3-1-2-3) ERPSystem.Infrastructure
-ERPSystem.Domain 참조 추가
+3-1-2-1) ERPSystem.Infrastructure
 
 3-1-3) 패키지 설치(ERPSystem.API) : 유지보수성, 보안성, 확장성, 효율성을 높이기 위함
 3-1-3-1) JWT(Json Web Token) 인증을 위한 라이브러리
@@ -235,6 +228,8 @@ dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 - dotnet ef migrations 및 dotnet ef database update 명령어 사용 가능
 - 설치하지 않으면 마이그레이션 명령어 실행 시 에러 발생
 dotnet add package Microsoft.EntityFrameworkCore.Design
+3-1-3-7) 매핑을 자동화
+AutoMapper.Extensions.Microsoft.DependencyInjection 12.0.1
 
 3-1-2) 도메인 모델, 엔티티, 인터페이스 프로젝트 생성
 Class Library > ERPSystem.Domain
@@ -283,6 +278,7 @@ ERPSystem.Application
 ├── DTOs
 │   ├── OrdersDto.cs : 주문 정보를 전송하는 데이터 전송 객체
 │   ├── ProductsDto.cs : 제품 정보를 전송하는 데이터 전송 객체
+|   ├── InventoryDto.cs
 │   └── UsersDto.cs : 사용자 정보를 전송하는 데이터 전송 객체
 ├── Features
 │   ├── Orders
@@ -314,6 +310,16 @@ ERPSystem.Application
     ├── IOrdersRepository.cs : `Order` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
     ├── IProductsRepository.cs : `Product` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
     ├── IUsersRepository.cs : `User` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+    ├── IOrdersService.cs                // `Order` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+    ├── IProductsService.cs              // `Product` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+    ├── IUsersService.cs                 // `User` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+    ├── IOrdersCommandHandler.cs         // `Order` 명령 처리 핸들러 인터페이스
+    ├── IProductsCommandHandler.cs       // `Product` 명령 처리 핸들러 인터페이스
+    ├── IUsersCommandHandler.cs          // `User` 명령 처리 핸들러 인터페이스
+    ├── IOrdersQueryHandler.cs           // `Order` 쿼리 처리 핸들러 인터페이스
+    ├── IProductsQueryHandler.cs         // `Product` 쿼리 처리 핸들러 인터페이스
+    ├── IUsersQueryHandler.cs            // `User` 쿼리 처리 핸들러 인터페이스
+    ├── IInventoryService.cs
 
 3-1-3-2) 패키지 설치
 3-1-3-2-1) 객체 유효성 검사 라이브러리
@@ -326,12 +332,27 @@ MediatR 12.4.1
 3-1-3-2-4) 객체 간의 매핑을 자동으로 처리해주는 라이브러리
 DTO(Data Transfer Object)와 Entity 간의 변환을 자동화하여 코드 중복을 줄이고, 객체 변환 로직을 간결하게 만들어 줌 
 AutoMapper 10.1.1
+3-1-3-2-5) Microsoft의 DI 컨테이너
+Microsoft.Extentions.DependencyInjection 9.0.2
+
 
 3-1-3-3) 프로젝트 참조
 ERPSystem.Domain
 
 
 
+3-1-4) 인프라 프로젝트 생성
+Class Library > ERPSystem.Infrastructure
+ERPSystem.Infrastructure
+└── Data
+    └── ApplicationDbContext.cs
+
+3-1-4-1) 참조
+ERPSystem.Domain
+
+3-1-4-2) 패키지 설치
+EntityFrameworkCore 3.1.32
+Microsoft.EntityFrameworkCore.Relational 3.1.32
 
 
 
@@ -344,3 +365,57 @@ ERPSystem.Domain
 
 
 
+
+
+ERPSystem
+├── API                            // API 요청을 처리하는 프로젝트
+│   ├── Controllers                // API 컨트롤러들
+│   │   ├── ProductsController.cs
+│   │   ├── OrdersController.cs
+│   │   └── InventoryController.cs
+│   ├── Middleware                 // 예외 처리 미들웨어
+│   │   └── ValidationExceptionMiddleware.cs
+│   ├── Configuration              // 설정 관련 클래스들
+│   │   └── AppSettings.cs
+│   ├── Extensions                 // 서비스 확장 메서드
+│   │   └── ServiceExtensions.cs
+│   ├── Startup.cs                 // 앱 초기 설정 및 서비스 등록
+│   └── Program.cs                 // 프로그램 진입점
+├── Application                    // 비즈니스 로직 및 DTO를 처리하는 프로젝트
+│   ├── DTOs                       // 요청/응답 DTO들
+│   │   ├── ProductDto.cs
+│   │   ├── OrderDto.cs
+│   │   └── InventoryDto.cs
+│   ├── Services                   // 서비스 로직
+│   │   ├── ProductService.cs
+│   │   ├── OrderService.cs
+│   │   └── InventoryService.cs
+│   ├── Interfaces                 // 서비스 인터페이스
+│   │   ├── IProductService.cs
+│   │   ├── IOrderService.cs
+│   │   └── IInventoryService.cs
+├── Domain                         // 도메인 모델과 핵심 로직을 처리하는 프로젝트
+│   ├── Entities                   // 도메인 엔티티들
+│   │   ├── Product.cs
+│   │   ├── Order.cs
+│   │   └── Inventory.cs
+│   └── ValueObjects               // 도메인 값 객체
+│       ├── Address.cs
+│       └── Money.cs
+├── Infrastructure                 // DB와 외부 서비스 연동 프로젝트
+│   ├── Repositories               // 리포지토리 구현
+│   │   ├── ProductRepository.cs
+│   │   ├── OrderRepository.cs
+│   │   └── InventoryRepository.cs
+│   ├── Data                       // DBContext 및 마이그레이션
+│   │   └── ApplicationDbContext.cs
+│   ├── Migrations                 // DB 마이그레이션
+│   └── ExternalServices           // 외부 서비스 연동
+├── Tests                          // 유닛 테스트 및 통합 테스트
+│   ├── API                        // API 레이어에 대한 테스트
+│   ├── Application                // 비즈니스 로직에 대한 테스트
+│   ├── Domain                     // 도메인 모델에 대한 테스트
+│   └── Infrastructure             // DB 연동 테스트
+└── Shared                         // 공통 유틸리티 프로젝트
+    ├── Utilities                  // 공통 기능 (날짜 처리, 문자열 변환 등)
+    └── Extensions                 // 확장 메서드
