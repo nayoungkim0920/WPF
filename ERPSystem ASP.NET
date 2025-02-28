@@ -265,49 +265,70 @@ Class Library > ERPSystem.Application
 ERPSystem.Application
 ├── Common
 │   ├── Behaviors
-│   │   ├── LoggingBehavior.cs
-│   │   ├── ValidationBehavior.cs : 유효성 검사 오류를 캡슐화하여, 오류가 발생한 필드와 해당 오류 메시지를 관리(비지니스 로직에서 사용)
-│   │   └── PerformanceBehavior.cs
+│   │   ├── LoggingBehavior.cs : 요청이 처리되기 전에 로그를 남기고, 요청이 끝난 후 응답을 로그로 기록
+│   │   ├── ValidationBehavior.cs : 유효성 검사 로직을 구현하는 클래스
+│   │   └── PerformanceBehavior.cs : 성능 관련 정보를 로깅하는 클래스
 │   ├── Exceptions
-│   │   ├── ValidationException.cs
-│   │   ├── NotFoundException.cs
-│   │   └── CustomException.cs
+│   │   ├── ValidationException.cs : 유효성 검사 오류를 캡슐화하여, 오류가 발생한 필드와 해당 오류 메시지를 관리
+│   │   ├── NotFoundException.cs : 데이터가 없을 때 발생하는 예외 처리
+│   │   └── CustomException.cs : 커스텀 예외를 처리하는 클래스
 │   ├── Mappings
-│   │   ├── OrderProfile.cs
-│   │   ├── ProductProfile.cs
-│   │   └── UserProfile.cs
+│   │   ├── OrderProfile.cs : `Order` 엔티티와 `OrderDto` 간의 변환을 처리하는 AutoMapper 프로필
+│   │   ├── ProductProfile.cs : `Product` 엔티티와 `ProductDto` 간의 변환을 처리하는 AutoMapper 프로필
+│   │   └── UserProfile.cs : `User` 엔티티와 `UserDto` 간의 변환을 처리하는 AutoMapper 프로필
 │   └── Validators
-│       ├── CreateOrderValidator.cs
-│       ├── CreateProductValidator.cs
-│       └── CreateUserValidator.cs
+│       ├── CreateOrderValidator.cs : `Order` 생성 유효성 검사를 담당
+│       ├── CreateProductValidator.cs : `Product` 생성 유효성 검사를 담당
+│       └── CreateUserValidator.cs : `User` 생성 유효성 검사를 담당
+├── DTOs
+│   ├── OrderDto.cs : 주문 정보를 전송하는 데이터 전송 객체
+│   ├── ProductDto.cs : 제품 정보를 전송하는 데이터 전송 객체
+│   └── UserDto.cs : 사용자 정보를 전송하는 데이터 전송 객체
 ├── Features
 │   ├── Orders
 │   │   ├── Commands
-│   │   │   ├── CreateOrderCommand.cs
-│   │   │   ├── UpdateOrderCommand.cs
-│   │   │   ├── DeleteOrderCommand.cs
+│   │   │   ├── CreateOrderCommand.cs : 주문 생성 명령 처리
+│   │   │   ├── UpdateOrderCommand.cs : 주문 업데이트 명령 처리
+│   │   │   ├── DeleteOrderCommand.cs : 주문 삭제 명령 처리
 │   │   ├── Queries
-│   │   │   ├── GetOrderByIdQuery.cs
-│   │   │   ├── GetAllOrdersQuery.cs
+│   │   │   ├── GetOrderByIdQuery.cs : ID로 주문을 조회하는 쿼리
+│   │   │   ├── GetAllOrdersQuery.cs : 모든 주문을 조회하는 쿼리
 │   ├── Products
 │   │   ├── Commands
+│   │   │   ├── CreateProductCommand.cs : 제품 생성 명령 처리
+│   │   │   ├── UpdateProductCommand.cs : 제품 업데이트 명령 처리
+│   │   │   ├── DeleteProductCommand.cs : 제품 삭제 명령 처리
 │   │   ├── Queries
+│   │   │   ├── GetProductByIdQuery.cs : ID로 제품을 조회하는 쿼리
+│   │   │   ├── GetAllProductsQuery.cs : 모든 제품을 조회하는 쿼리
 │   ├── Users
 │   │   ├── Commands
+│   │   │   ├── CreateUserCommand.cs : 사용자 생성 명령 처리
+│   │   │   ├── UpdateUserCommand.cs : 사용자 업데이트 명령 처리
+│   │   │   ├── DeleteUserCommand.cs : 사용자 삭제 명령 처리
 │   │   ├── Queries
+│   │   │   ├── GetUserByIdQuery.cs : ID로 사용자 정보를 조회하는 쿼리
+│   │   │   ├── GetAllUsersQuery.cs : 모든 사용자 정보를 조회하는 쿼리
 └── Interfaces
-    ├── IUnitOfWork.cs
-    ├── IOrdersRepository.cs
-    ├── IProductsRepository.cs
-    ├── IUsersRepository.cs
+    ├── IUnitOfWork.cs : 트랜잭션 처리를 위한 유닛 오브 워크 인터페이스
+    ├── IOrdersRepository.cs : `Order` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+    ├── IProductsRepository.cs : `Product` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+    ├── IUsersRepository.cs : `User` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
 
 3-1-3-2) 패키지 설치
 3-1-3-2-1) 객체 유효성 검사 라이브러리
 FluentValidation 11.11.0
+3-1-3-2-2) 로깅 기능 표준 라이브러리
+Microsoft.Extensions.Logging 9.0.2
+3-1-3-2-3) 중재자 패턴(Mediator Pattern) 구현 라이브러리
+애플리케이션의 구성 요소들 간의 의존성을 줄이고, 명확한 방법으로 서로 통신할 수 있게 해 줌 
+MediatR 12.4.1
+3-1-3-2-4) 객체 간의 매핑을 자동으로 처리해주는 라이브러리
+DTO(Data Transfer Object)와 Entity 간의 변환을 자동화하여 코드 중복을 줄이고, 객체 변환 로직을 간결하게 만들어 줌 
+AutoMapper 10.1.1
 
-
-
-
+3-1-3-3) 프로젝트 참조
+ERPSystem.Domain
 
 
 
