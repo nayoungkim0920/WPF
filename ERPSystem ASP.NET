@@ -230,6 +230,12 @@ dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 dotnet add package Microsoft.EntityFrameworkCore.Design
 3-1-3-7) 매핑을 자동화
 AutoMapper.Extensions.Microsoft.DependencyInjection 12.0.1
+3-1-3-8) JSON 형태의 구조적 로깅을 지원 및 다양한 로깅 대상(Sinks)에 데이터를 기록
+Serilog 4.2.0
+3-1-3-9) Serilog을 .NET의 표준 로깅 시스템(ILogger)과 통합하는 확장 패키지
+Serilog.Extensions.Logging 9.0.0
+3-1-3-10) Swagger 문서에서 어노테이션(Annotations)을 지원하는 확장 패키지
+Swashbuckle.AspNetCore.Annotations 7.3.1
 
 3-1-2) 도메인 모델, 엔티티, 인터페이스 프로젝트 생성
 Class Library > ERPSystem.Domain
