@@ -599,7 +599,7 @@ ERPSystem.API 시작 → https://localhost:7151/swagger/index.html
 ERPSystem.Frontend > 터미널에서 열기 > cd ERPSystem.Frontend > npm start → http://localhost:3000
 
 3-1-5-1) ASP.NET
-3-1-5-1=1) 설계
+3-1-5-1-1) 설계
 ERPSystem.Frontend.ASPNET
 │── App_Code                      → 공통 비즈니스 로직 (예: 서비스 클래스, 유틸리티)
 │── App_Data                      → 데이터 저장소 (XML, SQLite 등)
@@ -637,3 +637,8 @@ ERPSystem.Frontend.ASPNET
 │── Global.asax                     → 전역 애플리케이션 이벤트
 │── Default.aspx                    → 메인 페이지
 └── Site.css                        → 전체 스타일 관리
+
+3-1-5-1-2) 프로젝트 생성
+ASP.NET Core 웹 애플리케이션 > ERPSystem.Frontend.ASPNET
+
+3-1-5-1-3) 
