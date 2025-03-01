@@ -48,74 +48,93 @@ ERPSystem.Domain
 ERPSystem.Application
 ├── Common
 │   ├── Behaviors
-│   │   ├── LoggingBehavior.cs : 요청이 처리되기 전에 로그를 남기고, 요청이 끝난 후 응답을 로그로 기록
-│   │   ├── ValidationBehavior.cs : 유효성 검사 로직을 구현하는 클래스
-│   │   └── PerformanceBehavior.cs : 성능 관련 정보를 로깅하는 클래스
+│   │   ├── LoggingBehavior.cs → 요청이 처리되기 전에 로그를 남기고, 요청이 끝난 후 응답을 로그로 기록
+│   │   ├── ValidationBehavior.cs → 유효성 검사 로직을 구현하는 클래스
+│   │   └── PerformanceBehavior.cs → 성능 관련 정보를 로깅하는 클래스
 │   ├── Exceptions
-│   │   ├── ValidationException.cs : 유효성 검사 오류를 캡슐화하여, 오류가 발생한 필드와 해당 오류 메시지를 관리
-│   │   ├── NotFoundException.cs : 데이터가 없을 때 발생하는 예외 처리
-│   │   └── CustomException.cs : 커스텀 예외를 처리하는 클래스
+│   │   ├── ValidationException.cs → 유효성 검사 오류를 캡슐화하여, 오류가 발생한 필드와 해당 오류 메시지를 관리
+│   │   ├── NotFoundException.cs → 데이터가 없을 때 발생하는 예외 처리
+│   │   └── CustomException.cs → 커스텀 예외를 처리하는 클래스
 │   ├── Mappings
-│   │   ├── OrderProfile.cs : `Order` 엔티티와 `OrderDto` 간의 변환을 처리하는 AutoMapper 프로필
-│   │   ├── ProductProfile.cs : `Product` 엔티티와 `ProductDto` 간의 변환을 처리하는 AutoMapper 프로필
-│   │   └── UserProfile.cs : `User` 엔티티와 `UserDto` 간의 변환을 처리하는 AutoMapper 프로필
+│   │   ├── OrderProfile.cs → `Order` 엔티티와 `OrderDto` 간의 변환을 처리하는 AutoMapper 프로필
+│   │   ├── ProductProfile.cs → `Product` 엔티티와 `ProductDto` 간의 변환을 처리하는 AutoMapper 프로필
+│   │   └── UserProfile.cs → `User` 엔티티와 `UserDto` 간의 변환을 처리하는 AutoMapper 프로필
 │   └── Validators
-│       ├── CreateOrderValidator.cs : `Order` 생성 유효성 검사를 담당
-│       ├── CreateProductValidator.cs : `Product` 생성 유효성 검사를 담당
-│       └── CreateUserValidator.cs : `User` 생성 유효성 검사를 담당
+│       ├── CreateOrderValidator.cs → `Order` 생성 유효성 검사를 담당
+│       ├── CreateProductValidator.cs → `Product` 생성 유효성 검사를 담당
+│       └── CreateUserValidator.cs → `User` 생성 유효성 검사를 담당
 ├── DTOs
-│   ├── OrdersDto.cs : 주문 정보를 전송하는 데이터 전송 객체
-│   ├── ProductsDto.cs : 제품 정보를 전송하는 데이터 전송 객체
+│   ├── OrdersDto.cs → 주문 정보를 전송하는 데이터 전송 객체
+│   ├── ProductsDto.cs → 제품 정보를 전송하는 데이터 전송 객체
 |   ├── InventoryDto.cs
-│   └── UsersDto.cs : 사용자 정보를 전송하는 데이터 전송 객체
+│   └── UsersDto.cs → 사용자 정보를 전송하는 데이터 전송 객체
 ├── Features
 │   ├── Orders
 │   │   ├── Commands
-│   │   │   ├── CreateOrderCommand.cs : 주문 생성 명령 처리
-│   │   │   ├── UpdateOrderCommand.cs : 주문 업데이트 명령 처리
-│   │   │   └── DeleteOrderCommand.cs : 주문 삭제 명령 처리
+│   │   │   ├── CreateOrderCommand.cs → 주문 생성 명령 처리
+│   │   │   ├── UpdateOrderCommand.cs → 주문 업데이트 명령 처리
+│   │   │   └── DeleteOrderCommand.cs → 주문 삭제 명령 처리
 │   │   ├── Queries
-│   │   │   ├── GetOrderByIdQuery.cs : ID로 주문을 조회하는 쿼리
-│   │   │   └── GetAllOrdersQuery.cs : 모든 주문을 조회하는 쿼리
+│   │   │   ├── GetOrderByIdQuery.cs → ID로 주문을 조회하는 쿼리
+│   │   │   └── GetAllOrdersQuery.cs → 모든 주문을 조회하는 쿼리
 │   ├── Products
 │   │   ├── Commands
-│   │   │   ├── CreateProductCommand.cs : 제품 생성 명령 처리
-│   │   │   ├── UpdateProductCommand.cs : 제품 업데이트 명령 처리
-│   │   │   └── DeleteProductCommand.cs : 제품 삭제 명령 처리
+│   │   │   ├── CreateProductCommand.cs → 제품 생성 명령 처리
+│   │   │   ├── UpdateProductCommand.cs → 제품 업데이트 명령 처리
+│   │   │   └── DeleteProductCommand.cs → 제품 삭제 명령 처리
 │   │   ├── Queries
-│   │   │   ├── GetProductByIdQuery.cs : ID로 제품을 조회하는 쿼리
-│   │   │   └── GetAllProductsQuery.cs : 모든 제품을 조회하는 쿼리
+│   │   │   ├── GetProductByIdQuery.cs → ID로 제품을 조회하는 쿼리
+│   │   │   └── GetAllProductsQuery.cs → 모든 제품을 조회하는 쿼리
 │   ├── Users
 │   │   ├── Commands
-│   │   │   ├── CreateUserCommand.cs : 사용자 생성 명령 처리
-│   │   │   ├── UpdateUserCommand.cs : 사용자 업데이트 명령 처리
-│   │   │   └── DeleteUserCommand.cs : 사용자 삭제 명령 처리
+│   │   │   ├── CreateUserCommand.cs → 사용자 생성 명령 처리
+│   │   │   ├── UpdateUserCommand.cs → 사용자 업데이트 명령 처리
+│   │   │   └── DeleteUserCommand.cs → 사용자 삭제 명령 처리
 │   │   ├── Queries
-│   │   │   ├── GetUserByIdQuery.cs : ID로 사용자 정보를 조회하는 쿼리
-│   │   │   └── GetAllUsersQuery.cs : 모든 사용자 정보를 조회하는 쿼리
+│   │   │   ├── GetUserByIdQuery.cs → ID로 사용자 정보를 조회하는 쿼리
+│   │   │   └── GetAllUsersQuery.cs → 모든 사용자 정보를 조회하는 쿼리
 ├── Interfaces
-|   ├── IUnitOfWork.cs : 트랜잭션 처리를 위한 유닛 오브 워크 인터페이스
-|   ├── IOrdersRepository.cs : `Order` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
-|   ├── IProductsRepository.cs : `Product` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
-|   ├── IUsersRepository.cs : `User` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
-|   ├── IOrdersService.cs                // `Order` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
-|   ├── IProductsService.cs              // `Product` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
-|   ├── IUsersService.cs                 // `User` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
-|   ├── IOrdersCommandHandler.cs         // `Order` 명령 처리 핸들러 인터페이스
-|   ├── IProductsCommandHandler.cs       // `Product` 명령 처리 핸들러 인터페이스
-|   ├── IUsersCommandHandler.cs          // `User` 명령 처리 핸들러 인터페이스
-|   ├── IOrdersQueryHandler.cs           // `Order` 쿼리 처리 핸들러 인터페이스
-|   ├── IProductsQueryHandler.cs         // `Product` 쿼리 처리 핸들러 인터페이스
-|   ├── IUsersQueryHandler.cs            // `User` 쿼리 처리 핸들러 인터페이스
-|   ├── IInventoryService.cs             // `Inventory` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
-|   ├── IInventoryRepository.cs          // `Inventory` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
-|   ├── IInventoryCommandHandler.cs      // `Inventory` 명령 처리 핸들러 인터페이스
-|   └── IInventoryQueryHandler.cs        // `Inventory` 쿼리 처리 핸들러 인터페이스
+|   ├── IUnitOfWork.cs              → 트랜잭션 처리를 위한 유닛 오브 워크 인터페이스
+|   ├── IOrdersRepository.cs        → `Order` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+|   ├── IProductsRepository.cs      → `Product` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+|   ├── IUsersRepository.cs         → `User` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+|   ├── IOrdersService.cs           → `Order` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+|   ├── IProductsService.cs         → `Product` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+|   ├── IUsersService.cs            → `User` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+|   ├── IOrdersCommandHandler.cs    → `Order` 명령 처리 핸들러 인터페이스
+|   ├── IProductsCommandHandler.cs  → `Product` 명령 처리 핸들러 인터페이스
+|   ├── IUsersCommandHandler.cs     → `User` 명령 처리 핸들러 인터페이스
+|   ├── IOrdersQueryHandler.cs      → `Order` 쿼리 처리 핸들러 인터페이스
+|   ├── IProductsQueryHandler.cs    → `Product` 쿼리 처리 핸들러 인터페이스
+|   ├── IUsersQueryHandler.cs       → `User` 쿼리 처리 핸들러 인터페이스
+|   ├── IInventoryService.cs        → `Inventory` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+|   ├── IInventoryRepository.cs     → `Inventory` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+|   ├── IInventoryCommandHandler.cs → `Inventory` 명령 처리 핸들러 인터페이스
+|   └── IInventoryQueryHandler.cs   → `Inventory` 쿼리 처리 핸들러 인터페이스
 ERPSystem.Infrastructure
-    ├──Data
-    |   └── ApplicationDbContext.cs
-    └── Interfaces
-        └── IApplicationDbContext.cs
+|   ├──Data
+|   |   └── ApplicationDbContext.cs
+|   └── Interfaces
+|       └── IApplicationDbContext.cs
+ERPSystem-Frontend
+├── public
+├── src
+│   ├── components  // React 컴포넌트
+│   │   ├── Users
+│   │   │   ├── UserList.js        → 사용자 목록
+│   │   │   └── UserForm.js        → 사용자 생성/수정 폼
+│   │   ├── Products
+│   │   │   ├── ProductList.js
+│   │   │   └── ProductForm.js
+│   │   ├── Orders
+│   │   │   ├── OrderList.js
+│   │   │   └── OrderForm.js
+│   ├── services
+│   │   └── apiService.js         → API 호출 서비스
+│   ├── App.js                    → 메인 앱 파일
+│   └── index.js                  → React 앱 진입점
+└── package.json
+
 4) DB설계
 - Users	사용자 정보 관리 (권한 포함)
 - Products	제품 정보 (이름, 가격, 재고)
@@ -476,3 +495,27 @@ ERPSystem.Domain
 3-1-4-2) 패키지 설치
 3-1-4-2-1)EntityFrameworkCore 3.1.32
 3-1-4-2-2)Microsoft.EntityFrameworkCore.Relational 3.1.32
+
+3-1-5) 프론트엔트
+3-1-5-1) 설계
+ERPSystem-Frontend
+├── public
+├── src
+│   ├── components  // React 컴포넌트
+│   │   ├── Users
+│   │   │   ├── UserList.js        → 사용자 목록
+│   │   │   └── UserForm.js        → 사용자 생성/수정 폼
+│   │   ├── Products
+│   │   │   ├── ProductList.js
+│   │   │   └── ProductForm.js
+│   │   ├── Orders
+│   │   │   ├── OrderList.js
+│   │   │   └── OrderForm.js
+│   ├── services
+│   │   └── apiService.js         → API 호출 서비스
+│   ├── App.js                    → 메인 앱 파일
+│   └── index.js                  → React 앱 진입점
+└── package.json
+
+
+
