@@ -498,7 +498,7 @@ ERPSystem.Domain
 
 3-1-5) 프론트엔트
 3-1-5-1) 설계
-ERPSystem-Frontend
+ERPSystem.Frontend
 ├── public
 ├── src
 │   ├── components  // React 컴포넌트
@@ -517,5 +517,15 @@ ERPSystem-Frontend
 │   └── index.js                  → React 앱 진입점
 └── package.json
 
+3-1-5-2) Node.js 설치
+https://nodejs.org/ko Node.js node-v22.14.0-x64.msi 다운로드
+C:\Program Files\nodejs 설치
 
+3-1-5-3) 프로젝트 생성
+빈 프로젝트(C#) > ERPSystem.Frontend
+
+3-1-5-4) React 프로젝트 생성
+솔루션 탐색기 > ERPSystem.Frontend 우클릭 > 터미널(PowerShell)
+node -v
+npm -v
 
