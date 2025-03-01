@@ -558,5 +558,5 @@ AuthServer 시작 → https://localhost:7190/swagger/index.html
 ERPSystem.API 시작 → https://localhost:7151/swagger/index.html
 ERPSystem.Frontend > 터미널에서 열기 > cd ERPSystem.Frontend > npm start → http://localhost:3000
 
-
+3-1-7) ASPX 프론트엔드 프로젝트 생성
 
