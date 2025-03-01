@@ -134,7 +134,7 @@ ERPSystem.Frontend.React           → 프론트엔드 (React)
 |   │   └── apiService.js         → API 호출 서비스
 |   ├── App.js                    → 메인 앱 파일
 |   └── index.js                  → React 앱 진입점
-ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhost:7081
+ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhost:44366
 │── App_Code                      → 공통 비즈니스 로직 (예: 서비스 클래스, 유틸리티)
 │── App_Data                      → 데이터 저장소 (XML, SQLite 등)
 │── Scripts                       → JavaScript 및 jQuery 스크립트
@@ -639,6 +639,6 @@ ERPSystem.Frontend.ASPNET(https://localhost:7081)
 └── Site.css                        → 전체 스타일 관리
 
 3-1-5-1-2) 프로젝트 생성
-ASP.NET Core 웹 애플리케이션 > ERPSystem.Frontend.ASPNET
+ASP.NET Web Application > ERPSystem.Frontend.ASPNET (https://localhost:44366)
 
 3-1-5-1-3) 
