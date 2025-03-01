@@ -525,7 +525,38 @@ C:\Program Files\nodejs 설치
 빈 프로젝트(C#) > ERPSystem.Frontend
 
 3-1-5-4) React 프로젝트 생성
-솔루션 탐색기 > ERPSystem.Frontend 우클릭 > 터미널(PowerShell)
-node -v
-npm -v
+
+- Node.js 설치 확인
+솔루션 탐색기 > ERPSystem.Frontend 우클릭 > 터미널(PowerShell)에서 열기
+PS C:\ASP.NETproject\ERPSystem\ERPSystem.Frontend> node -v
+>> npm -v
+v22.14.0
+10.9.2
+
+- React 프로젝트 생성
+PS C:\ASP.NETproject\ERPSystem\ERPSystem.Frontend> 
+npx create-react-app my-app --template cra-template
+Move-Item -Path my-app\* -Destination ERPSystem.Frontend -Force
+Get-ChildItem -Path my-app -Force | Move-Item -Destination ERPSystem.Frontend -Force
+Remove-Item -Path my-app -Recurse -Force (my-app 폴더 삭제)
+cd ERPSystem.Frontend
+npm install 
+npm start 
+=====================================================================================
+Compiled successfully!
+
+You can now view my-app in the browser.
+
+  Local:            http://localhost:3000
+  On Your Network:  http://192.168.0.3:3000
+
+Note that the development build is not optimized.
+To create a production build, use npm run build.
+
+webpack compiled successfully
+====================================================================================
+
+
+
+
 
