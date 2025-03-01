@@ -116,24 +116,22 @@ ERPSystem.Infrastructure
 |   |   └── ApplicationDbContext.cs
 |   └── Interfaces
 |       └── IApplicationDbContext.cs
-ERPSystem-Frontend
-├── public
-├── src
-│   ├── components  // React 컴포넌트
-│   │   ├── Users
-│   │   │   ├── UserList.js        → 사용자 목록
-│   │   │   └── UserForm.js        → 사용자 생성/수정 폼
-│   │   ├── Products
-│   │   │   ├── ProductList.js
-│   │   │   └── ProductForm.js
-│   │   ├── Orders
-│   │   │   ├── OrderList.js
-│   │   │   └── OrderForm.js
-│   ├── services
-│   │   └── apiService.js         → API 호출 서비스
-│   ├── App.js                    → 메인 앱 파일
-│   └── index.js                  → React 앱 진입점
-└── package.json
+ERPSystem.Frontend
+└── src
+    ├── components  // React 컴포넌트
+    │   ├── Users
+    │   │   ├── UserList.js        → 사용자 목록
+    │   │   └── UserForm.js        → 사용자 생성/수정 폼
+    │   ├── Products
+    │   │   ├── ProductList.js
+    │   │   └── ProductForm.js
+    │   ├── Orders
+    │   │   ├── OrderList.js
+    │   │   └── OrderForm.js
+    ├── services
+    │   └── apiService.js         → API 호출 서비스
+    ├── App.js                    → 메인 앱 파일
+    └── index.js                  → React 앱 진입점
 
 4) DB설계
 - Users	사용자 정보 관리 (권한 포함)
@@ -499,23 +497,22 @@ ERPSystem.Domain
 3-1-5) 프론트엔트
 3-1-5-1) 설계
 ERPSystem.Frontend
-├── public
-├── src
-│   ├── components  // React 컴포넌트
-│   │   ├── Users
-│   │   │   ├── UserList.js        → 사용자 목록
-│   │   │   └── UserForm.js        → 사용자 생성/수정 폼
-│   │   ├── Products
-│   │   │   ├── ProductList.js
-│   │   │   └── ProductForm.js
-│   │   ├── Orders
-│   │   │   ├── OrderList.js
-│   │   │   └── OrderForm.js
-│   ├── services
-│   │   └── apiService.js         → API 호출 서비스
-│   ├── App.js                    → 메인 앱 파일
-│   └── index.js                  → React 앱 진입점
-└── package.json
+└── src
+    ├── components  // React 컴포넌트
+    │   ├── Users
+    │   │   ├── UserList.js        → 사용자 목록
+    │   │   └── UserForm.js        → 사용자 생성/수정 폼
+    │   ├── Products
+    │   │   ├── ProductList.js
+    │   │   └── ProductForm.js
+    │   ├── Orders
+    │   │   ├── OrderList.js
+    │   │   └── OrderForm.js
+    ├── services
+    │   └── apiService.js         → API 호출 서비스
+    ├── App.js                    → 메인 앱 파일
+    └── index.js                  → React 앱 진입점
+
 
 3-1-5-2) Node.js 설치
 https://nodejs.org/ko Node.js node-v22.14.0-x64.msi 다운로드
@@ -556,7 +553,7 @@ To create a production build, use npm run build.
 webpack compiled successfully
 ====================================================================================
 
-
+3-1-5-5) Node.js 프로젝트를 수동으로 추가
 
 
 
