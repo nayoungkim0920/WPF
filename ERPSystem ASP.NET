@@ -2,12 +2,114 @@
 1) 목적 : 간단한 사용자 관리, 재고 관리, 주문 관리를 한다.
 2) 개발도구 : Visual studio 2022, MSSQL EXPRESS 2022
 3) 시스템설계
+3-1) 전체
 /ERPSystem (솔루션)
  ├── ERPSystem.API           → ASP.NET Core Web API (백엔드)
  ├── ERPSystem.Application   → 비즈니스 로직, CQRS 패턴 적용
  ├── ERPSystem.Domain        → 도메인 모델, 엔티티, 인터페이스
- ├── ERPSystem.Infrastructure → 데이터베이스, 외부 연동 (EF Core)
-
+ └── ERPSystem.Infrastructure → 데이터베이스, 외부 연동 (EF Core)
+3-2) 상세
+ERPSystem.API                     // API 요청을 처리하는 프로젝트
+|   ├── Controllers                // API 컨트롤러들
+|   │   ├── ProductsController.cs
+|   │   ├── OrdersController.cs
+|   │   └── InventoryController.cs
+|   ├── Middleware                 // 예외 처리 미들웨어
+|   │   └── ValidationExceptionMiddleware.cs
+|   ├── Configuration              // 설정 관련 클래스들
+|   │   └── AppSettings.cs
+|   ├── Extensions                 // 서비스 확장 메서드
+|   │   └── ServiceExtensions.cs
+|   ├── Profiles                 // OrdersDto와 CreateOrderCommand, UpdateOrderCommand 간의 매핑을 자동화하기 위해 AutoMapper 프로파일을 설정
+|   │   └── OrdersProfile.cs
+|   ├── Startup.cs                 // 앱 초기 설정 및 서비스 등록
+|   └── Program.cs                 // 프로그램 진입점
+ERPSystem.Domain
+├── Entities
+│   ├── Users.cs          → users 테이블
+│   ├── Products.cs       → products 테이블
+│   ├── Orders.cs         → orders 테이블
+│   ├── OrderDetails.cs   → order_details 테이블
+│   └── Inventory.cs    → inventories 테이블
+├── Interfaces
+│   ├── IUsersRepository.cs         → IUsersRepository 인터페이스
+│   ├── IProductsRepository.cs      → IProductsRepository 인터페이스
+│   ├── IOrdersRepository.cs        → IOrdersRepository 인터페이스
+│   ├── IOrderDetailsRepository.cs  → IOrderDetailsRepository 인터페이스
+│   └── IInventoryRepository.cs   → IInventoriesRepository 인터페이스
+├── Enums
+|   └── OrderStatus.cs    → 주문 상태(Enum)
+ERPSystem.Application
+├── Common
+│   ├── Behaviors
+│   │   ├── LoggingBehavior.cs : 요청이 처리되기 전에 로그를 남기고, 요청이 끝난 후 응답을 로그로 기록
+│   │   ├── ValidationBehavior.cs : 유효성 검사 로직을 구현하는 클래스
+│   │   └── PerformanceBehavior.cs : 성능 관련 정보를 로깅하는 클래스
+│   ├── Exceptions
+│   │   ├── ValidationException.cs : 유효성 검사 오류를 캡슐화하여, 오류가 발생한 필드와 해당 오류 메시지를 관리
+│   │   ├── NotFoundException.cs : 데이터가 없을 때 발생하는 예외 처리
+│   │   └── CustomException.cs : 커스텀 예외를 처리하는 클래스
+│   ├── Mappings
+│   │   ├── OrderProfile.cs : `Order` 엔티티와 `OrderDto` 간의 변환을 처리하는 AutoMapper 프로필
+│   │   ├── ProductProfile.cs : `Product` 엔티티와 `ProductDto` 간의 변환을 처리하는 AutoMapper 프로필
+│   │   └── UserProfile.cs : `User` 엔티티와 `UserDto` 간의 변환을 처리하는 AutoMapper 프로필
+│   └── Validators
+│       ├── CreateOrderValidator.cs : `Order` 생성 유효성 검사를 담당
+│       ├── CreateProductValidator.cs : `Product` 생성 유효성 검사를 담당
+│       └── CreateUserValidator.cs : `User` 생성 유효성 검사를 담당
+├── DTOs
+│   ├── OrdersDto.cs : 주문 정보를 전송하는 데이터 전송 객체
+│   ├── ProductsDto.cs : 제품 정보를 전송하는 데이터 전송 객체
+|   ├── InventoryDto.cs
+│   └── UsersDto.cs : 사용자 정보를 전송하는 데이터 전송 객체
+├── Features
+│   ├── Orders
+│   │   ├── Commands
+│   │   │   ├── CreateOrderCommand.cs : 주문 생성 명령 처리
+│   │   │   ├── UpdateOrderCommand.cs : 주문 업데이트 명령 처리
+│   │   │   └── DeleteOrderCommand.cs : 주문 삭제 명령 처리
+│   │   ├── Queries
+│   │   │   ├── GetOrderByIdQuery.cs : ID로 주문을 조회하는 쿼리
+│   │   │   └── GetAllOrdersQuery.cs : 모든 주문을 조회하는 쿼리
+│   ├── Products
+│   │   ├── Commands
+│   │   │   ├── CreateProductCommand.cs : 제품 생성 명령 처리
+│   │   │   ├── UpdateProductCommand.cs : 제품 업데이트 명령 처리
+│   │   │   └── DeleteProductCommand.cs : 제품 삭제 명령 처리
+│   │   ├── Queries
+│   │   │   ├── GetProductByIdQuery.cs : ID로 제품을 조회하는 쿼리
+│   │   │   └── GetAllProductsQuery.cs : 모든 제품을 조회하는 쿼리
+│   ├── Users
+│   │   ├── Commands
+│   │   │   ├── CreateUserCommand.cs : 사용자 생성 명령 처리
+│   │   │   ├── UpdateUserCommand.cs : 사용자 업데이트 명령 처리
+│   │   │   └── DeleteUserCommand.cs : 사용자 삭제 명령 처리
+│   │   ├── Queries
+│   │   │   ├── GetUserByIdQuery.cs : ID로 사용자 정보를 조회하는 쿼리
+│   │   │   └── GetAllUsersQuery.cs : 모든 사용자 정보를 조회하는 쿼리
+├── Interfaces
+|   ├── IUnitOfWork.cs : 트랜잭션 처리를 위한 유닛 오브 워크 인터페이스
+|   ├── IOrdersRepository.cs : `Order` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+|   ├── IProductsRepository.cs : `Product` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+|   ├── IUsersRepository.cs : `User` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+|   ├── IOrdersService.cs                // `Order` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+|   ├── IProductsService.cs              // `Product` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+|   ├── IUsersService.cs                 // `User` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+|   ├── IOrdersCommandHandler.cs         // `Order` 명령 처리 핸들러 인터페이스
+|   ├── IProductsCommandHandler.cs       // `Product` 명령 처리 핸들러 인터페이스
+|   ├── IUsersCommandHandler.cs          // `User` 명령 처리 핸들러 인터페이스
+|   ├── IOrdersQueryHandler.cs           // `Order` 쿼리 처리 핸들러 인터페이스
+|   ├── IProductsQueryHandler.cs         // `Product` 쿼리 처리 핸들러 인터페이스
+|   ├── IUsersQueryHandler.cs            // `User` 쿼리 처리 핸들러 인터페이스
+|   ├── IInventoryService.cs             // `Inventory` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+|   ├── IInventoryRepository.cs          // `Inventory` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+|   ├── IInventoryCommandHandler.cs      // `Inventory` 명령 처리 핸들러 인터페이스
+|   └── IInventoryQueryHandler.cs        // `Inventory` 쿼리 처리 핸들러 인터페이스
+ERPSystem.Infrastructure
+    ├──Data
+    |   └── ApplicationDbContext.cs
+    └── Interfaces
+        └── IApplicationDbContext.cs
 4) DB설계
 - Users	사용자 정보 관리 (권한 포함)
 - Products	제품 정보 (이름, 가격, 재고)
@@ -343,88 +445,22 @@ DTO(Data Transfer Object)와 Entity 간의 변환을 자동화하여 코드 중�
 AutoMapper 10.1.1
 3-1-3-2-5) Microsoft의 DI 컨테이너
 Microsoft.Extentions.DependencyInjection 9.0.2
-
+3-1-3-2-6) 데이터베이스와 상호작용할 수 있도록 해주는 Object-Relational Mapping (ORM) 프레임워크
+Microsoft.EntityFrameworkCore 3.1.32
 
 3-1-3-3) 프로젝트 참조
 ERPSystem.Domain
-
-
 
 3-1-4) 인프라 프로젝트 생성
 Class Library > ERPSystem.Infrastructure
 ERPSystem.Infrastructure
 └── Data
-    └── ApplicationDbContext.cs
-
+|   └── ApplicationDbContext.cs
+└── Interfaces
+    └── IApplicationDbContext.cs
 3-1-4-1) 참조
 ERPSystem.Domain
 
 3-1-4-2) 패키지 설치
-EntityFrameworkCore 3.1.32
-Microsoft.EntityFrameworkCore.Relational 3.1.32
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-ERPSystem
-├── API                            // API 요청을 처리하는 프로젝트
-│   ├── Controllers                // API 컨트롤러들
-│   │   ├── ProductsController.cs
-│   │   ├── OrdersController.cs
-│   │   └── InventoryController.cs
-│   ├── Middleware                 // 예외 처리 미들웨어
-│   │   └── ValidationExceptionMiddleware.cs
-│   ├── Configuration              // 설정 관련 클래스들
-│   │   └── AppSettings.cs
-│   ├── Extensions                 // 서비스 확장 메서드
-│   │   └── ServiceExtensions.cs
-│   ├── Startup.cs                 // 앱 초기 설정 및 서비스 등록
-│   └── Program.cs                 // 프로그램 진입점
-├── Application                    // 비즈니스 로직 및 DTO를 처리하는 프로젝트
-│   ├── DTOs                       // 요청/응답 DTO들
-│   │   ├── ProductDto.cs
-│   │   ├── OrderDto.cs
-│   │   └── InventoryDto.cs
-│   ├── Services                   // 서비스 로직
-│   │   ├── ProductService.cs
-│   │   ├── OrderService.cs
-│   │   └── InventoryService.cs
-│   ├── Interfaces                 // 서비스 인터페이스
-│   │   ├── IProductService.cs
-│   │   ├── IOrderService.cs
-│   │   └── IInventoryService.cs
-├── Domain                         // 도메인 모델과 핵심 로직을 처리하는 프로젝트
-│   ├── Entities                   // 도메인 엔티티들
-│   │   ├── Product.cs
-│   │   ├── Order.cs
-│   │   └── Inventory.cs
-│   └── ValueObjects               // 도메인 값 객체
-│       ├── Address.cs
-│       └── Money.cs
-├── Infrastructure                 // DB와 외부 서비스 연동 프로젝트
-│   ├── Repositories               // 리포지토리 구현
-│   │   ├── ProductRepository.cs
-│   │   ├── OrderRepository.cs
-│   │   └── InventoryRepository.cs
-│   ├── Data                       // DBContext 및 마이그레이션
-│   │   └── ApplicationDbContext.cs
-│   ├── Migrations                 // DB 마이그레이션
-│   └── ExternalServices           // 외부 서비스 연동
-├── Tests                          // 유닛 테스트 및 통합 테스트
-│   ├── API                        // API 레이어에 대한 테스트
-│   ├── Application                // 비즈니스 로직에 대한 테스트
-│   ├── Domain                     // 도메인 모델에 대한 테스트
-│   └── Infrastructure             // DB 연동 테스트
-└── Shared                         // 공통 유틸리티 프로젝트
-    ├── Utilities                  // 공통 기능 (날짜 처리, 문자열 변환 등)
-    └── Extensions                 // 확장 메서드
+3-1-4-2-1)EntityFrameworkCore 3.1.32
+3-1-4-2-2)Microsoft.EntityFrameworkCore.Relational 3.1.32
