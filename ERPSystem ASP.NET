@@ -9,28 +9,34 @@
  ├── ERPSystem.Domain        → 도메인 모델, 엔티티, 인터페이스
  └── ERPSystem.Infrastructure → 데이터베이스, 외부 연동 (EF Core)
 3-2) 상세
-ERPSystem.API                     // API 요청을 처리하는 프로젝트
-|   ├── Controllers                // API 컨트롤러들
+/ERPSystem (솔루션)
+|
+AuthServer                         → 인증서버 프로젝트                   
+|   ├── appsettings.json            
+|   ├── AuthServer.http
+|   └── Program.cs
+ERPSystem.API                      → API 요청을 처리하는 프로젝트
+|   ├── Controllers                → API 컨트롤러들
 |   │   ├── ProductsController.cs
 |   │   ├── OrdersController.cs
 |   │   └── InventoryController.cs
-|   ├── Middleware                 // 예외 처리 미들웨어
+|   ├── Middleware                 → 예외 처리 미들웨어
 |   │   └── ValidationExceptionMiddleware.cs
-|   ├── Configuration              // 설정 관련 클래스들
+|   ├── Configuration              → 설정 관련 클래스들
 |   │   └── AppSettings.cs
-|   ├── Extensions                 // 서비스 확장 메서드
+|   ├── Extensions                 ㅍ 서비스 확장 메서드
 |   │   └── ServiceExtensions.cs
-|   ├── Profiles                 // OrdersDto와 CreateOrderCommand, UpdateOrderCommand 간의 매핑을 자동화하기 위해 AutoMapper 프로파일을 설정
+|   ├── Profiles                   → OrdersDto와 CreateOrderCommand, UpdateOrderCommand 간의 매핑을 자동화하기 위해 AutoMapper 프로파일을 설정
 |   │   └── OrdersProfile.cs
-|   ├── Startup.cs                 // 앱 초기 설정 및 서비스 등록
-|   └── Program.cs                 // 프로그램 진입점
+|   ├── Startup.cs                 → 앱 초기 설정 및 서비스 등록
+|   └── Program.cs                 → 프로그램 진입점
 ERPSystem.Domain
 ├── Entities
 │   ├── Users.cs          → users 테이블
 │   ├── Products.cs       → products 테이블
 │   ├── Orders.cs         → orders 테이블
 │   ├── OrderDetails.cs   → order_details 테이블
-│   └── Inventory.cs    → inventories 테이블
+│   └── Inventory.cs      → inventories 테이블
 ├── Interfaces
 │   ├── IUsersRepository.cs         → IUsersRepository 인터페이스
 │   ├── IProductsRepository.cs      → IProductsRepository 인터페이스
@@ -259,6 +265,12 @@ JWT 토큰 검증/Bearer 인증 처리/사용자 권한 관리
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer 
 
 2-3) https://localhost:7190/swagger/index.html
+2-3-1) 설계
+AuthServer                     
+   ├── appsettings.json            
+   ├── AuthServer.http
+   └── Program.cs
+2-3-2) 실행
 POST : /api/Auth/login > Try it out > username, password 입력 > Execute
 Code	Details 200	
 Response body
