@@ -11,7 +11,7 @@
 3-2) 상세
 /ERPSystem (솔루션)
 |
-AuthServer                         → 인증서버 프로젝트                   
+AuthServer(https://localhost:7190)                         → 인증서버 프로젝트                   
 |   ├── appsettings.json            
 |   ├── AuthServer.http
 |   └── Program.cs
@@ -553,7 +553,10 @@ To create a production build, use npm run build.
 webpack compiled successfully
 ====================================================================================
 
-3-1-5-5) Node.js 프로젝트를 수동으로 추가
+3-1-6) 통합 실행
+AuthServer 시작 → https://localhost:7190/swagger/index.html
+ERPSystem.API 시작 → https://localhost:7151/swagger/index.html
+ERPSystem.Frontend > 터미널에서 열기 > cd ERPSystem.Frontend > npm start → http://localhost:3000
 
 
 
