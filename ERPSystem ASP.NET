@@ -134,7 +134,7 @@ ERPSystem.Frontend.React           → 프론트엔드 (React)
 |   │   └── apiService.js         → API 호출 서비스
 |   ├── App.js                    → 메인 앱 파일
 |   └── index.js                  → React 앱 진입점
-ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET)
+ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhost:7081
 │── App_Code                      → 공통 비즈니스 로직 (예: 서비스 클래스, 유틸리티)
 │── App_Data                      → 데이터 저장소 (XML, SQLite 등)
 │── Scripts                       → JavaScript 및 jQuery 스크립트
@@ -600,7 +600,7 @@ ERPSystem.Frontend > 터미널에서 열기 > cd ERPSystem.Frontend > npm start 
 
 3-1-5-1) ASP.NET
 3-1-5-1-1) 설계
-ERPSystem.Frontend.ASPNET
+ERPSystem.Frontend.ASPNET(https://localhost:7081)
 │── App_Code                      → 공통 비즈니스 로직 (예: 서비스 클래스, 유틸리티)
 │── App_Data                      → 데이터 저장소 (XML, SQLite 등)
 │── Scripts                       → JavaScript 및 jQuery 스크립트
