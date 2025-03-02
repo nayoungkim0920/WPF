@@ -121,22 +121,6 @@ ERPSystem.Infrastructure
 |   |   └── ApplicationDbContext.cs
 |   └── Interfaces
 |       └── IApplicationDbContext.cs
-ERPSystem.Frontend.React           → 프론트엔드 (React)
-└── src
-|   ├── components                 → React 컴포넌트
-|   │   ├── Users
-|   │   │   ├── UserList.js        → 사용자 목록
-|   │   │   └── UserForm.js        → 사용자 생성/수정 폼
-|   │   ├── Products
-|   │   │   ├── ProductList.js
-|   │   │   └── ProductForm.js
-|   │   ├── Orders
-|   │   │   ├── OrderList.js
-|   │   │   └── OrderForm.js
-|   ├── services
-|   │   └── apiService.js         → API 호출 서비스
-|   ├── App.js                    → 메인 앱 파일
-|   └── index.js                  → React 앱 진입점
 ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhost:44366
 │── App_Code                      → 공통 비즈니스 로직 (예: 서비스 클래스, 유틸리티)
 │── App_Data                      → 데이터 저장소 (XML, SQLite 등)
@@ -331,7 +315,12 @@ AuthServer
    ├── appsettings.json            
    ├── AuthServer.http
    └── Program.cs
-2-3-2) 실행
+2-3-2) 환경변수 등록
+시스템 환경 변수 편집 > 환경변수 > 등록
+export Jwt__SecretKey=***********************************************
+환경변수 등록 확인
+echo %Jwt__SecretKey%
+2-3-3) 실행
 POST : /api/Auth/login > Try it out > username, password 입력 > Execute
 Code	Details 200	
 Response body
