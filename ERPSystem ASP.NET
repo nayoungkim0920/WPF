@@ -320,6 +320,8 @@ AuthServer
 export Jwt__SecretKey=***********************************************
 환경변수 등록 확인
 echo %Jwt__SecretKey%
+PowerShell 관리자권한으로 실행
+[System.Environment]::SetEnvironmentVariable("Jwt__SecretKey", "this_is_a_very_strong_secret_key_32_bytes", "Machine")
 2-3-3) 실행
 POST : /api/Auth/login > Try it out > username, password 입력 > Execute
 Code	Details 200	
