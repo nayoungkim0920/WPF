@@ -1,4 +1,4 @@
-# ERPSystem ASP.NET
+# ERPSystem ASP.NET (For PC/Mobile)
 Date. 2025-03-03
 
 ![Image](https://github.com/user-attachments/assets/954258ad-273e-455e-ba38-e9fc13944e92)
