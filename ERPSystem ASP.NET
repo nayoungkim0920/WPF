@@ -8,7 +8,6 @@
  ├── ERPSystem.Application     → 비즈니스 로직, CQRS 패턴 적용
  ├── ERPSystem.Domain          → 도메인 모델, 엔티티, 인터페이스
  ├── ERPSystem.Infrastructure  → 데이터베이스, 외부 연동 (EF Core)
- ├── ERPSystem.Frontend.React  → 프론트엔드 (React)
  └── ERPSystem.Frontend.ASPNET → 프론트엔드 (ASPNET)
 3-2) 상세
 /ERPSystem (솔루션)
@@ -116,6 +115,8 @@ ERPSystem.Application
 |   ├── IInventoryRepository.cs     → `Inventory` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
 |   ├── IInventoryCommandHandler.cs → `Inventory` 명령 처리 핸들러 인터페이스
 |   └── IInventoryQueryHandler.cs   → `Inventory` 쿼리 처리 핸들러 인터페이스
+├── Services
+|   └── ProductsServices.cs
 ERPSystem.Infrastructure
 |   ├──Data
 |   |   └── ApplicationDbContext.cs
@@ -479,24 +480,25 @@ ERPSystem.Application
 │   │   │   ├── GetUserByIdQuery.cs : ID로 사용자 정보를 조회하는 쿼리
 │   │   │   ├── GetAllUsersQuery.cs : 모든 사용자 정보를 조회하는 쿼리
 └── Interfaces
-    ├── IUnitOfWork.cs : 트랜잭션 처리를 위한 유닛 오브 워크 인터페이스
-    ├── IOrdersRepository.cs : `Order` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
-    ├── IProductsRepository.cs : `Product` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
-    ├── IUsersRepository.cs : `User` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
-    ├── IOrdersService.cs                // `Order` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
-    ├── IProductsService.cs              // `Product` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
-    ├── IUsersService.cs                 // `User` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
-    ├── IOrdersCommandHandler.cs         // `Order` 명령 처리 핸들러 인터페이스
-    ├── IProductsCommandHandler.cs       // `Product` 명령 처리 핸들러 인터페이스
-    ├── IUsersCommandHandler.cs          // `User` 명령 처리 핸들러 인터페이스
-    ├── IOrdersQueryHandler.cs           // `Order` 쿼리 처리 핸들러 인터페이스
-    ├── IProductsQueryHandler.cs         // `Product` 쿼리 처리 핸들러 인터페이스
-    ├── IUsersQueryHandler.cs            // `User` 쿼리 처리 핸들러 인터페이스
-    ├── IInventoryService.cs             // `Inventory` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
-    ├── IInventoryRepository.cs          // `Inventory` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
-    ├── IInventoryCommandHandler.cs      // `Inventory` 명령 처리 핸들러 인터페이스
-    └── IInventoryQueryHandler.cs        // `Inventory` 쿼리 처리 핸들러 인터페이스
-
+│   ├── IUnitOfWork.cs : 트랜잭션 처리를 위한 유닛 오브 워크 인터페이스
+│   ├── IOrdersRepository.cs : `Order` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+│   ├── IProductsRepository.cs : `Product` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+│   ├── IUsersRepository.cs : `User` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+│   ├── IOrdersService.cs                // `Order` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+│   ├── IProductsService.cs              // `Product` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+│   ├── IUsersService.cs                 // `User` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+│   ├── IOrdersCommandHandler.cs         // `Order` 명령 처리 핸들러 인터페이스
+│   ├── IProductsCommandHandler.cs       // `Product` 명령 처리 핸들러 인터페이스
+│   ├── IUsersCommandHandler.cs          // `User` 명령 처리 핸들러 인터페이스
+│   ├── IOrdersQueryHandler.cs           // `Order` 쿼리 처리 핸들러 인터페이스
+│   ├── IProductsQueryHandler.cs         // `Product` 쿼리 처리 핸들러 인터페이스
+│   ├── IUsersQueryHandler.cs            // `User` 쿼리 처리 핸들러 인터페이스
+│   ├── IInventoryService.cs             // `Inventory` 관련 비즈니스 로직을 처리하는 서비스 인터페이스
+│   ├── IInventoryRepository.cs          // `Inventory` 엔티티에 대한 데이터 액세스를 담당하는 인터페이스
+│   ├── IInventoryCommandHandler.cs      // `Inventory` 명령 처리 핸들러 인터페이스
+│   └── IInventoryQueryHandler.cs        // `Inventory` 쿼리 처리 핸들러 인터페이스
+└── Services
+    └── ProductsServices.cs
 3-1-3-2) 패키지 설치
 3-1-3-2-1) 객체 유효성 검사 라이브러리
 FluentValidation 11.11.0
