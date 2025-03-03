@@ -5,6 +5,7 @@ Date. 2025-03-03
 1) 기능 : 로그인/아웃, 사용자 관리, 재고 관리, 주문 관리
 2) 개발도구 : Visual studio 2022, MSSQL EXPRESS 2022
 3) 시스템설계도
+
 ERPSystem
  ├── AuthServer                → 인증서버 https://localhost:7190
  ├── ERPSystem.API             → ASP.NET Core Web API (백엔드) https://localhost:7151
