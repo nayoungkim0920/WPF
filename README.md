@@ -6,14 +6,6 @@ Date. 2025-03-03
 2) 개발도구 : Visual studio 2022, MSSQL EXPRESS 2022
 3) 시스템설계도
 
-ERPSystem
- ├── AuthServer                → 인증서버 https://localhost:7190
- ├── ERPSystem.API             → ASP.NET Core Web API (백엔드) https://localhost:7151
- ├── ERPSystem.Application     → 비즈니스 로직, CQRS 패턴 적용
- ├── ERPSystem.Domain          → 도메인 모델, 엔티티, 인터페이스
- ├── ERPSystem.Infrastructure  → 데이터베이스, 외부 연동 (EF Core)
- └── ERPSystem.Frontend.ASPNET → ASP.NET (프론트엔드) https://localhost:44366/Pages/Auth/Login
-
 ![Image](https://github.com/user-attachments/assets/954258ad-273e-455e-ba38-e9fc13944e92)
 
 ![Image](https://github.com/user-attachments/assets/ba310f55-6be9-4fbb-9071-897816c3963c)
