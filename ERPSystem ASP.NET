@@ -670,3 +670,12 @@ Response.Write($"Session username: {Session["Username"]}");  // 세션에 저장
 // 로그인 성공 시 리디렉션
 Response.Clear();
 Response.Redirect("/Dashboard/Dashboard.aspx", false);
+
+오류)
+An unhandled exception occurred while processing the request.
+InvalidOperationException: Unable to resolve service for type 'ERPSystem.Application.Interfaces.IProductsService' while attempting to activate 'ERPSystem.API.Controllers.ProductsController'.
+Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ThrowHelperUnableToResolveService(Type type, Type requiredBy)
+
+수정)
+IProductsService 인터페이스를 ProductsController에서 사용하려고 할 때, 
+의존성 주입(Dependency Injection) 컨테이너에서 해당 서비스를 해결할 수 없다는 것을 의미
