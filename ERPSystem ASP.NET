@@ -673,3 +673,11 @@ Response.Write($"Session username: {Session["Username"]}");  // 세션에 저장
 Response.Clear();
 Response.Redirect("/Dashboard/Dashboard.aspx", false);
 
+오류)
+A connection was successfully established with the server, but then an error occurred during the login process. (provider: SSL Provider, error: 0 - 신뢰되지 않은 기관에서 인증서 체인을 발급했습니다.)
+수정)
+connectionString에 TrustServerCertificate=True; 추가
+
+오류)
+An exception has been raised that is likely due to a transient failure. Consider enabling transient error resiliency by adding 'EnableRetryOnFailure' to the 'UseSqlServer' call.
+수정)
