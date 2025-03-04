@@ -126,10 +126,9 @@ ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhos
 │── App_Code                      → 공통 비즈니스 로직 (예: 서비스 클래스, 유틸리티)
 │── App_Data                      → 데이터 저장소 (XML, SQLite 등)
 │── Scripts                       → JavaScript 및 jQuery 스크립트
-│── Styles                        → CSS 스타일 파일
-│── MasterPages                   → 마스터 페이지 (공통 레이아웃)
-│   ├── Site.Master               → 전체 레이아웃을 관리하는 마스터 페이지
-│   └── Admin.Master              → 관리자 전용 마스터 페이지
+│── Styles                        → CSS 스타일
+│   ├── Css                      
+│   └── styles.css      
 │── Pages
 │   ├── Auth                      → 로그인 및 인증 관련 페이지
 │   │   ├── Login.aspx
@@ -140,7 +139,7 @@ ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhos
 │   │   ├── Dashboard.aspx
 │   │   └── Dashboard.aspx.cs
 │   ├── Orders                     → 주문 관련 페이지
-│   │   ├── OrdersList.aspx        → 주문 목록
+│   │   ├── OrdersList.aspx        → 주문 관리
 │   │   ├── OrdersDetails.aspx     → 주문 상세 정보
 │   │   └── OrdersCreate.aspx      → 주문 생성
 │   ├── Products                   → 제품 관련 페이지
@@ -151,14 +150,16 @@ ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhos
 │   │   ├── UsersList.aspx
 │   │   ├── UsersDetails.aspx
 │   │   └── UsersCreate.aspx
-│   ├── Inventory                  → 재고 관리 페이지
-│   │   ├── InventoryList.aspx
-│   │   ├── InventoryDetails.aspx
-│   │   └── InventoryUpdate.aspx
+│   └── Inventory                  → 재고 관리 페이지
+│       ├── InventoryList.aspx
+│       ├── InventoryDetails.aspx
+│       └── InventoryUpdate.aspx
+│── Controls                       → 마스터페이지 (공통 레이아웃)
+│   ├── CommonTopMenu.ascx         → 상단 레이아웃 
+│   └── CommonBottomMenu.ascx      → 하단 레이아웃
 │── Web.config                      → 웹 설정 파일
 │── Global.asax                     → 전역 애플리케이션 이벤트
-│── Default.aspx                    → 메인 페이지
-└── Site.css                        → 전체 스타일 관리
+└── Default.aspx                    → 메인 페이지
 
 4) DB설계
 - Users	사용자 정보 관리 (권한 포함)
@@ -599,14 +600,13 @@ ERPSystem.Frontend > 터미널에서 열기 > cd ERPSystem.Frontend > npm start 
 
 3-1-5-1) ASP.NET
 3-1-5-1-1) 설계
-ERPSystem.Frontend.ASPNET(https://localhost:7081)
+ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhost:44366
 │── App_Code                      → 공통 비즈니스 로직 (예: 서비스 클래스, 유틸리티)
 │── App_Data                      → 데이터 저장소 (XML, SQLite 등)
 │── Scripts                       → JavaScript 및 jQuery 스크립트
-│── Styles                        → CSS 스타일 파일
-│── MasterPages                   → 마스터 페이지 (공통 레이아웃)
-│   ├── Site.Master               → 전체 레이아웃을 관리하는 마스터 페이지
-│   └── Admin.Master              → 관리자 전용 마스터 페이지
+│── Styles                        → CSS 스타일
+│   ├── Css                      
+│   └── styles.css      
 │── Pages
 │   ├── Auth                      → 로그인 및 인증 관련 페이지
 │   │   ├── Login.aspx
@@ -617,7 +617,7 @@ ERPSystem.Frontend.ASPNET(https://localhost:7081)
 │   │   ├── Dashboard.aspx
 │   │   └── Dashboard.aspx.cs
 │   ├── Orders                     → 주문 관련 페이지
-│   │   ├── OrdersList.aspx        → 주문 목록
+│   │   ├── OrdersList.aspx        → 주문 관리
 │   │   ├── OrdersDetails.aspx     → 주문 상세 정보
 │   │   └── OrdersCreate.aspx      → 주문 생성
 │   ├── Products                   → 제품 관련 페이지
@@ -628,14 +628,16 @@ ERPSystem.Frontend.ASPNET(https://localhost:7081)
 │   │   ├── UsersList.aspx
 │   │   ├── UsersDetails.aspx
 │   │   └── UsersCreate.aspx
-│   ├── Inventory                  → 재고 관리 페이지
-│   │   ├── InventoryList.aspx
-│   │   ├── InventoryDetails.aspx
-│   │   └── InventoryUpdate.aspx
+│   └── Inventory                  → 재고 관리 페이지
+│       ├── InventoryList.aspx
+│       ├── InventoryDetails.aspx
+│       └── InventoryUpdate.aspx
+│── Controls                       → 마스터페이지 (공통 레이아웃)
+│   ├── CommonTopMenu.ascx         → 상단 레이아웃 
+│   └── CommonBottomMenu.ascx      → 하단 레이아웃
 │── Web.config                      → 웹 설정 파일
 │── Global.asax                     → 전역 애플리케이션 이벤트
-│── Default.aspx                    → 메인 페이지
-└── Site.css                        → 전체 스타일 관리
+└── Default.aspx                    → 메인 페이지
 
 3-1-5-1-2) 프로젝트 생성
 ASP.NET Web Application > ERPSystem.Frontend.ASPNET (https://localhost:44366)
