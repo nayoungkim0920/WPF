@@ -13,6 +13,8 @@ Date. 2025-03-03
 
 ![Image](https://github.com/user-attachments/assets/46fcdbf7-4fec-4945-bf4f-0f9ac4e9f43e)
 
+![Image](https://github.com/user-attachments/assets/912aad24-969b-410e-aa20-d4b862c4fff9)
+
 # WPF 원격지 클라이언트 관리 프로그램 : 업그레이드 
 Date. 2025-02-22
 
