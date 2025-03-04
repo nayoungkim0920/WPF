@@ -68,6 +68,7 @@ ERPSystem.Application
 │       ├── CreateProductValidator.cs → `Product` 생성 유효성 검사를 담당
 │       └── CreateUserValidator.cs → `User` 생성 유효성 검사를 담당
 ├── DTOs
+│   ├── MetricsDto.cs → 대시 보드 정보를 전송하는 데이터 전송 객체
 │   ├── OrdersDto.cs → 주문 정보를 전송하는 데이터 전송 객체
 │   ├── ProductsDto.cs → 제품 정보를 전송하는 데이터 전송 객체
 |   ├── InventoryDto.cs
@@ -139,21 +140,21 @@ ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhos
 │   │   ├── Dashboard.aspx
 │   │   └── Dashboard.aspx.cs
 │   ├── Orders                     → 주문 관련 페이지
-│   │   ├── OrdersList.aspx        → 주문 관리
-│   │   ├── OrdersDetails.aspx     → 주문 상세 정보
+│   │   ├── OrdersDetail.aspx        → 주문 관리
+│   │   ├── OrdersUpdate.aspx     → 주문 상세 정보
 │   │   └── OrdersCreate.aspx      → 주문 생성
 │   ├── Products                   → 제품 관련 페이지
-│   │   ├── ProductsList.aspx
-│   │   ├── ProductsDetails.aspx
+│   │   ├── ProductsDetail.aspx
+│   │   ├── ProductsUpdate.aspx
 │   │   └── ProductsCreate.aspx
 │   ├── Users                      → 사용자 관리 페이지
-│   │   ├── UsersList.aspx
-│   │   ├── UsersDetails.aspx
+│   │   ├── UsersDetail.aspx
+│   │   ├── UsersUpdate.aspx
 │   │   └── UsersCreate.aspx
 │   └── Inventory                  → 재고 관리 페이지
-│       ├── InventoryList.aspx
-│       ├── InventoryDetails.aspx
-│       └── InventoryUpdate.aspx
+│       ├── InventoryDetail.aspx
+│       ├── InventoryUpdate.aspx
+│       └── InventoryCreate.aspx
 │── Controls                       → 마스터페이지 (공통 레이아웃)
 │   ├── CommonTopMenu.ascx         → 상단 레이아웃 
 │   └── CommonBottomMenu.ascx      → 하단 레이아웃
@@ -451,6 +452,7 @@ ERPSystem.Application
 │       ├── CreateProductValidator.cs : `Product` 생성 유효성 검사를 담당
 │       └── CreateUserValidator.cs : `User` 생성 유효성 검사를 담당
 ├── DTOs
+│   ├── MetricsDto.cs → 대시 보드 정보를 전송하는 데이터 전송 객체
 │   ├── OrdersDto.cs : 주문 정보를 전송하는 데이터 전송 객체
 │   ├── ProductsDto.cs : 제품 정보를 전송하는 데이터 전송 객체
 |   ├── InventoryDto.cs
@@ -617,21 +619,21 @@ ERPSystem.Frontend.ASPNET         → 프론트엔드 (ASP.NET) https://localhos
 │   │   ├── Dashboard.aspx
 │   │   └── Dashboard.aspx.cs
 │   ├── Orders                     → 주문 관련 페이지
-│   │   ├── OrdersList.aspx        → 주문 관리
-│   │   ├── OrdersDetails.aspx     → 주문 상세 정보
+│   │   ├── OrdersDetail.aspx        → 주문 관리
+│   │   ├── OrdersUpdate.aspx     → 주문 상세 정보
 │   │   └── OrdersCreate.aspx      → 주문 생성
 │   ├── Products                   → 제품 관련 페이지
-│   │   ├── ProductsList.aspx
-│   │   ├── ProductsDetails.aspx
+│   │   ├── ProductsDetail.aspx
+│   │   ├── ProductsUpdate.aspx
 │   │   └── ProductsCreate.aspx
 │   ├── Users                      → 사용자 관리 페이지
-│   │   ├── UsersList.aspx
-│   │   ├── UsersDetails.aspx
+│   │   ├── UsersDetail.aspx
+│   │   ├── UsersUpdate.aspx
 │   │   └── UsersCreate.aspx
 │   └── Inventory                  → 재고 관리 페이지
-│       ├── InventoryList.aspx
-│       ├── InventoryDetails.aspx
-│       └── InventoryUpdate.aspx
+│       ├── InventoryDetail.aspx
+│       ├── InventoryUpdate.aspx
+│       └── InventoryCreate.aspx
 │── Controls                       → 마스터페이지 (공통 레이아웃)
 │   ├── CommonTopMenu.ascx         → 상단 레이아웃 
 │   └── CommonBottomMenu.ascx      → 하단 레이아웃
