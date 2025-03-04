@@ -7,7 +7,7 @@ Date. 2025-03-03
 3) 시스템설계도
 ![Image](https://github.com/user-attachments/assets/fabc545a-10b0-4140-8eb0-a16b7b753fad)
 
-![Image](https://github.com/user-attachments/assets/954258ad-273e-455e-ba38-e9fc13944e92)
+![Image](https://github.com/user-attachments/assets/0ca1a03a-7a42-48cf-80ab-9d50d1c0693d)
 
 ![Image](https://github.com/user-attachments/assets/35c962a9-593c-4ded-bdbe-d222e3a3bb57)
 
