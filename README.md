@@ -27,7 +27,7 @@ Date. 2025-03-03
 
 4-5) 상품수정
 
-![Image](https://github.com/user-attachments/assets/6f2586e1-190c-4f96-928b-3d7d39e0013f)
+![Image](https://github.com/user-attachments/assets/1e6e08e5-a82c-462d-8b87-5cf78b7e9b61)
 
 # WPF 원격지 클라이언트 관리 프로그램 : 업그레이드 
 Date. 2025-02-22
