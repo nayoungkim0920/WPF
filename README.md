@@ -11,7 +11,7 @@ Date. 2025-03-03
 
 ![Image](https://github.com/user-attachments/assets/35c962a9-593c-4ded-bdbe-d222e3a3bb57)
 
-![Image](https://github.com/user-attachments/assets/46fcdbf7-4fec-4945-bf4f-0f9ac4e9f43e)
+![Image](https://github.com/user-attachments/assets/6abb4f2d-4466-4bcf-b074-7e47e6a5fd28)
 
 ![Image](https://github.com/user-attachments/assets/3ce0cd37-ee9f-4ea2-aecc-6ab5dd9938aa)
 
