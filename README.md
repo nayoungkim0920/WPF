@@ -15,7 +15,7 @@ Date. 2025-03-03
 
 4-2) 대시보드
 
-![Image](https://github.com/user-attachments/assets/35c962a9-593c-4ded-bdbe-d222e3a3bb57)
+![Image](https://github.com/user-attachments/assets/c43a76bd-33b8-4a42-b166-577007e0eaf6)
 
 4-3) 상품관리
 
