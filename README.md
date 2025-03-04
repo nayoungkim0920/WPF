@@ -7,15 +7,17 @@ Date. 2025-03-03
 3) 시스템설계도
 ![Image](https://github.com/user-attachments/assets/fabc545a-10b0-4140-8eb0-a16b7b753fad)
 
+4) 실행화면
+4-1) 로그인
 ![Image](https://github.com/user-attachments/assets/0ca1a03a-7a42-48cf-80ab-9d50d1c0693d)
-
+4-2) 대시보드
 ![Image](https://github.com/user-attachments/assets/35c962a9-593c-4ded-bdbe-d222e3a3bb57)
-
+4-3) 상품관리
 ![Image](https://github.com/user-attachments/assets/6abb4f2d-4466-4bcf-b074-7e47e6a5fd28)
-
+4-4) 상품상세
 ![Image](https://github.com/user-attachments/assets/3ce0cd37-ee9f-4ea2-aecc-6ab5dd9938aa)
-
-![Image](https://github.com/user-attachments/assets/4dec2ceb-0e2e-4c86-b3b8-77056eead33a)
+4-5) 상품수정
+![Image](https://github.com/user-attachments/assets/6f2586e1-190c-4f96-928b-3d7d39e0013f)
 
 # WPF 원격지 클라이언트 관리 프로그램 : 업그레이드 
 Date. 2025-02-22
