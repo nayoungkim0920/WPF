@@ -11,23 +11,27 @@ Date. 2025-03-03
    
 4-1) 로그인
 
-![Image](https://github.com/user-attachments/assets/0ca1a03a-7a42-48cf-80ab-9d50d1c0693d)
+![Image](https://github.com/user-attachments/assets/32c6ef47-0976-4b1c-b7bc-923e309746a9)
 
 4-2) 대시보드
 
-![Image](https://github.com/user-attachments/assets/c43a76bd-33b8-4a42-b166-577007e0eaf6)
+![Image](https://github.com/user-attachments/assets/16cdc5f1-1c5f-4ff3-94e2-89069d5e4fa7)
 
 4-3) 상품관리
 
-![Image](https://github.com/user-attachments/assets/6abb4f2d-4466-4bcf-b074-7e47e6a5fd28)
+![Image](https://github.com/user-attachments/assets/02128888-3cfe-4a8d-a661-16bc7adddae7)
 
 4-4) 상품상세
 
-![Image](https://github.com/user-attachments/assets/3ce0cd37-ee9f-4ea2-aecc-6ab5dd9938aa)
+![Image](https://github.com/user-attachments/assets/367bdc21-df63-4a56-b1cf-d940151ef237)
 
 4-5) 상품수정
 
-![Image](https://github.com/user-attachments/assets/1e6e08e5-a82c-462d-8b87-5cf78b7e9b61)
+![Image](https://github.com/user-attachments/assets/0ab7f6d5-0715-48c6-b95b-8f36a10381bb)
+
+4-6) 상품수정완료
+
+![Image](https://github.com/user-attachments/assets/7377fce1-d1ab-4ab3-94c0-a4ba055d32c2)
 
 # WPF 원격지 클라이언트 관리 프로그램 : 업그레이드 
 Date. 2025-02-22
