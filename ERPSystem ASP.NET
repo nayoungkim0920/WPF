@@ -175,6 +175,8 @@ Orders (OrderId) 1 ─── * OrderDetails (OrderId)
 Products (ProductId) 1 ─── * OrderDetails (ProductId)
 Products (ProductId) 1 ─── * Inventory (ProductId)
 
+sqlcmd -S localhost -U sa -P ********
+
 CREATE DATABASE ERPSystem;
 GO
 
@@ -204,8 +206,15 @@ CREATE TABLE Products (
     ProductName NVARCHAR(200) NOT NULL,
     Price DECIMAL(10,2) CHECK (Price > 0) NOT NULL,
     StockQuantity INT CHECK (StockQuantity >= 0) NOT NULL,
+    IsDeleted BIT DEFAULT 0,
     CreatedAt DATETIME DEFAULT GETDATE()
 );
+GO
+
+ALTER TABLE Products
+ADD IsDeleted BIT DEFAULT 0;
+
+Update Products set IsDeleted = 0; --활성상태로 설정
 GO
 
 INSERT INTO Products (ProductName, Price, StockQuantity) VALUES 
