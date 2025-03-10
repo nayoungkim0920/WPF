@@ -19,19 +19,31 @@ Date. 2025-03-03
 
 4-3) 상품관리
 
-![Image](https://github.com/user-attachments/assets/02128888-3cfe-4a8d-a661-16bc7adddae7)
+![Image](https://github.com/user-attachments/assets/e903fcdc-b37c-4cee-a803-2f7d93b322bf)
 
-4-4) 상품상세
+4-4) 상품등록
 
-![Image](https://github.com/user-attachments/assets/367bdc21-df63-4a56-b1cf-d940151ef237)
+![Image](https://github.com/user-attachments/assets/8200f523-4db0-4d1b-9e48-7a610d23c154)
 
-4-5) 상품수정
+4-5) 상품상세
 
-![Image](https://github.com/user-attachments/assets/0ab7f6d5-0715-48c6-b95b-8f36a10381bb)
+![Image](https://github.com/user-attachments/assets/63c05370-7115-4e5a-8ec0-1dd7c493e629)
 
-4-6) 상품수정완료
+4-6) 상품수정
 
-![Image](https://github.com/user-attachments/assets/7377fce1-d1ab-4ab3-94c0-a4ba055d32c2)
+![Image](https://github.com/user-attachments/assets/d6c1a4ea-08c0-4a9d-a606-c19981f7b3b7)
+
+4-7) 상품삭제
+
+![Image](https://github.com/user-attachments/assets/f2118b4d-9c55-4c70-9b0d-306fdd8563f9)
+
+4-8) 상품삭제완료
+
+![Image](https://github.com/user-attachments/assets/64c9d4a4-e62a-4fa3-9ea8-53173876887f)
+
+4-9) 상품삭제완료 대시보드
+
+![Image](https://github.com/user-attachments/assets/7cca4905-ba0d-4bd3-973a-024a909e35e4)
 
 # WPF 원격지 클라이언트 관리 프로그램 : 업그레이드 
 Date. 2025-02-22
